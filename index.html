@@ -1,92 +1,3 @@
-Claude
-Can you make an .io multiplayer online game?
-
-Read 2 files, ran a command, and 2 more tools
-Building a multiplayer .io game for you; the page is written, and I’m publishing it now.
-
-Blobz.io
-Artifact
-·Only you
-Yes. I built Blobz.io, an agar.io-style game: drag to steer, eat pellets, swallow smaller blobs, and avoid bigger ones.
-
-Everyone who opens the link at the same time shares one arena in real time. Only signed-in people can join the live room, so public-link visitors play against the bots instead. The bots only exist on your own screen. I haven’t playtested it with several people at once.
-
-I assumed the agar.io style. I can switch it to snake.io, add a team mode, or change the look if you’d prefer something else.
-
-adapt it for github it is hosted on github make mutiplayer work and after that add some few more features
-
-Created a file, ran a command, shared files
-I rebuilt it as a single index.html for GitHub Pages. The syntax checks out, but I couldn’t test the multiplayer here because I have no network access, so please try it with two browser tabs first.
-
-Multiplayer no longer depends on Claude. It now uses PeerJS (loaded from a CDN, no server of your own). The first player in a room becomes the host and relays everyone’s positions, and if the host leaves, another player takes over. If the PeerJS connection fails repeatedly, the game falls back to bots only.
-
-To deploy, commit index.html to a repo, then go to Settings → Pages and deploy from your main branch. Open the page in two tabs or on two devices and both should see each other.
-
-I added four features:
-
-Boost: hold Space or tap the Boost button to dash, at the cost of some mass.
-Minimap: shows the arena and where the other players are.
-Rooms: enter a room code on the start screen, and the page URL becomes …/#roomname, so you can send that link to friends for a private game.
-Colour and best score: pick your blob colour; your nickname, colour and best score are saved in the browser.
-Players on strict corporate or mobile networks may fail to connect, because there’s no relay server for those cases. If that happens, the fix is a small WebSocket server (for example on Render), which I can write if you want it.
-
-Index
-Code
-·HTML
-make the bots server side add a secret cheat menu by doing something that you cant do by acident, fix bot ai and add random powerups server side too
-
-Ran 2 commands, shared files
-I’ve updated index.html. I checked the syntax and ran the bot simulation headlessly for about 200 seconds with no errors, but I haven’t tried it with two real browsers. Please test the multiplayer with two tabs.
-
-“Server side” here means the host player’s browser, because GitHub Pages can’t run server code. The first player in a room runs the bots and powerups and sends them to everyone else. Everyone sees the same bots and pickups, and if the host leaves, another player takes over with fresh bots. The host’s tab should stay in the foreground, because browsers slow background tabs down. A real Node server on something like Render would fix that if you want one.
-
-Cheat menu: type the Konami code on a keyboard (↑ ↑ ↓ ↓ ← → ← → B A), or tap the title or the Mass readout 7 times within 3 seconds. It has God mode, Speed ×2, Wide view, +100 mass, and Summon powerup. The cheats run on your own browser, so the other players in the room are affected by them.
-
-Bot AI: the old bots only ever reacted to you, and they could get pinned against the walls. The new ones do the following:
-
-They flee from any bigger blob, harder the closer it is.
-They hunt smaller players and other bots, so they now eat each other.
-They go for pellets and powerups, wander smoothly when nothing is nearby, and steer away from walls.
-Powerups: one spawns every 5 to 9 seconds, with at most 6 on the map, and bots grab them too. ⚡ gives 8 seconds of speed, 🛡 gives 8 seconds of shield (nobody can eat you, and others see a blue ring), and ✚ gives +30 mass.
-
-Index
-Code
-·HTML
-add emotes and remove feature which slowly makes you smaller while big
-
-Ran 2 commands, shared files
-I’ve updated index.html with emotes, and big players no longer shrink slowly. The syntax check and bot simulation still pass, but I haven’t tried it in a real browser, so please check two tabs against each other.
-
-Emotes: press keys 1 to 5, or tap the 😀 button at the bottom centre and pick one. The emote floats above your blob for 2.5 seconds, and everyone in the room sees it. You can send one about once a second. The five are 👋 😂 😠 😮 💜, and I can swap them for others if you like.
-
-Shrinking: your mass now only drops when you boost. I left the bots’ own slow shrink in place so they don’t grow huge and end up eating everyone.
-
-Index
-Code
-·HTML
-show verison number in corner of current verision, fix cheat code to be doable on keyboard and a bit easier
-
-Ran 2 commands, shared files
-I’ve updated index.html to v1.4. The version number now shows in the bottom-right corner, including on the start screen. I tested the key logic by simulating key presses, but I haven’t tried it in a real browser.
-
-I couldn’t find one definite bug in the old keyboard code, but two things made it fragile. Holding a key slightly too long restarted the sequence, and it matched the physical key position, so it could fail on non-QWERTY keyboards. It now ignores held-key repeats, matches the letter you actually press, and forgives mistakes in the middle of a sequence.
-
-You can now open the cheat menu any of these ways:
-
-Type cheat while playing. It’s ignored in the nickname and room boxes, so a player named “cheat” won’t trigger it.
-Press ↑ ↑ ↓ ↓ ← → B A, a shortened Konami code.
-Press the full Konami code (↑ ↑ ↓ ↓ ← → ← → B A).
-Tap the title or the Mass readout 7 times within 3 seconds, which still works on phones.
-Index
-Code
-·HTML
-
-
-
-Claude is AI and can make mistakes. Please double-check responses.
-
-
-Index · HTML
 <!doctype html>
 <html lang="en">
 <head>
@@ -95,9 +6,9 @@ Index · HTML
 <title>Blobz.io</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='44' fill='%236b4cf0'/%3E%3C/svg%3E">
 <style>
-:root{--bg:#eef0f7;--grid:#dde1ee;--fg:#1b1d2e;--card:#fff;--mut:#666b85;--acc:#6b4cf0;--wall:#e5484d;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12141f;--grid:#1d2132;--fg:#e9ebf6;--card:#1b1f31;--mut:#9aa0bd;--acc:#8f7bff}}
-:root[data-theme="dark"]{--bg:#12141f;--grid:#1d2132;--fg:#e9ebf6;--card:#1b1f31;--mut:#9aa0bd;--acc:#8f7bff}
+:root{--bg:#eef0f7;--grid:#dde1ee;--fg:#1b1d2e;--card:#fff;--mut:#666b85;--acc:#6b4cf0;--wall:#e5484d;--gold:#c98500;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12141f;--grid:#1d2132;--fg:#e9ebf6;--card:#1b1f31;--mut:#9aa0bd;--acc:#8f7bff;--gold:#ffc83d}}
+:root[data-theme="dark"]{--bg:#12141f;--grid:#1d2132;--fg:#e9ebf6;--card:#1b1f31;--mut:#9aa0bd;--acc:#8f7bff;--gold:#ffc83d}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 html,body{height:100%;margin:0;overflow:hidden;background:var(--bg);color:var(--fg);font:15px/1.4 ui-rounded,"SF Pro Rounded",system-ui,-apple-system,"Segoe UI",sans-serif}
 canvas#c{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none}
@@ -111,19 +22,35 @@ canvas#c{position:fixed;inset:0;width:100%;height:100%;display:block;touch-actio
 #emr[hidden]{display:none}
 #cm{position:fixed;right:10px;top:50%;transform:translateY(-50%);width:176px;padding:12px;border-radius:14px;background:var(--card);box-shadow:0 8px 28px rgba(20,20,60,.25)}
 #cm[hidden]{display:none}
+#bn{position:fixed;top:calc(env(safe-area-inset-top,0px) + 76px);left:50%;transform:translateX(-50%);padding:10px 18px;border-radius:14px;background:var(--acc);color:#fff;font-weight:700;pointer-events:none;text-align:center}
+.rw{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:8px}
+.rw button{width:auto;margin:0;padding:5px 8px;font-size:20px;background:var(--bg);color:var(--fg);border:2px solid transparent}
+.rw button.on{border-color:var(--acc)}
+#rl button{background:var(--bg);color:var(--fg);font-weight:600;text-align:left;font-size:14px;margin:0 0 6px}
+details{text-align:left;margin-bottom:10px;color:var(--mut)}
+summary{cursor:pointer;margin-bottom:8px}
+label.ck{display:flex;align-items:center;font-size:14px;color:var(--fg);margin:4px 0 8px}
+input[type=checkbox]{width:auto;margin:0 8px 0 0;padding:0}
 #ver{position:fixed;right:8px;bottom:calc(env(safe-area-inset-bottom,0px) + 2px);font-size:11px;color:var(--mut);opacity:.8;pointer-events:none}
 #cm button{margin:6px 0 0;padding:9px;font-size:14px}
 #mm{position:fixed;left:10px;bottom:calc(env(safe-area-inset-bottom,0px) + 10px);width:96px;height:96px;pointer-events:none}
 #bst{position:fixed;right:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 14px);width:76px;height:76px;border-radius:50%;padding:0;font-size:14px;touch-action:none;user-select:none;-webkit-user-select:none}
 #ov{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:16px;background:color-mix(in srgb,var(--bg) 70%,transparent)}
-#card{background:var(--card);border-radius:18px;padding:22px;width:min(340px,100%);text-align:center;box-shadow:0 10px 36px rgba(20,20,60,.2)}
+#card{background:var(--card);border-radius:18px;padding:22px;width:min(340px,100%);max-height:100%;overflow:auto;text-align:center;box-shadow:0 10px 36px rgba(20,20,60,.2)}
 h1{margin:0 0 6px;font-size:30px;letter-spacing:-.02em}
 p{color:var(--mut);margin:0 0 14px}
-input,button{font:inherit;font-size:16px;width:100%;box-sizing:border-box;border-radius:10px;padding:12px;border:1px solid var(--grid);background:var(--bg);color:var(--fg);margin-bottom:8px}
+input,button,select{font:inherit;font-size:16px;width:100%;box-sizing:border-box;border-radius:10px;padding:12px;border:1px solid var(--grid);background:var(--bg);color:var(--fg);margin-bottom:8px}
 input[type=range]{padding:0;border:0;background:transparent;height:28px}
 button{background:var(--acc);border:0;color:#fff;font-weight:700;cursor:pointer}
 button:focus-visible,input:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
 label{display:block;text-align:left;font-size:12px;color:var(--mut);margin:2px 2px 4px}
+#lb .k1{color:var(--gold);font-weight:800}
+#mnb{position:fixed;left:10px;top:calc(env(safe-area-inset-top,0px) + 86px);width:auto;margin:0;padding:7px 12px;font-size:13px;background:color-mix(in srgb,var(--card) 88%,transparent);color:var(--fg);border:1px solid var(--grid)}
+#cf{position:fixed;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(10,10,30,.5)}
+#cf[hidden]{display:none}
+#cf>div{background:var(--card);border-radius:18px;padding:22px;width:min(320px,100%);text-align:center;box-shadow:0 10px 36px rgba(20,20,60,.3)}
+#cf h2{margin:0 0 6px;font-size:22px}
+#cfy{background:var(--wall)}
 </style>
 </head>
 <body>
@@ -134,13 +61,21 @@ label{display:block;text-align:left;font-size:12px;color:var(--mut);margin:2px 2
 <div id="hud"><div id="st"></div><div id="lb"></div></div>
 <div id="ov"><div id="card">
 <h1 id="h1">Blobz.io</h1>
-<p id="msg">Eat pellets, swallow smaller blobs, dodge bigger ones. Drag to steer, hold Space or Boost to dash. Grab powerups: ⚡ speed, 🛡 shield, ✚ mass. Emote with keys 1–5 or the 😀 button.</p>
+<p id="msg">Eat pellets, swallow smaller blobs, dodge bigger ones. Drag to steer, hold Space or Boost to dash. Grab powerups (⚡ 🛡 ✚ 🧲 🍎 🔭 🚀 💥 📡 🌱). Emote with keys 1–5 or the 😀 button. Esc or ☰ Menu goes back to this menu.</p>
 <input id="nm" maxlength="14" placeholder="Nickname" autocomplete="off" enterkeyhint="go" aria-label="Nickname">
 <label for="hue">Blob colour</label>
 <input id="hue" type="range" min="0" max="359">
 <label for="rm">Room (share the page link to play together)</label>
 <input id="rm" maxlength="20" autocomplete="off" aria-label="Room">
+<details open><summary>Room settings (used when you create the room)</summary>
+<label class="ck"><input type="checkbox" id="pub"> Public room: show it in the room browser (off = private, join by name or link only)</label>
+<label for="mo">Game mode</label><select id="mo"><option value="0">Classic: biggest blob wins</option><option value="1">Rush: 3-minute rounds</option><option value="2">Hill: hold the zone, first to 60 points</option></select>
+<label for="mp">Map</label><select id="mp"><option value="0">Meadow: large and calm</option><option value="1">Neon Pit: small and intense</option></select>
+</details>
+<details><summary>Emotes (pick a slot, then an emoji)</summary><div class="rw" id="es"></div><div class="rw" id="ep"></div></details>
 <button id="go">Play</button>
+<button id="br" style="background:var(--bg);color:var(--fg);border:1px solid var(--grid)">Browse public rooms</button>
+<div id="rl"></div>
 <p id="net" style="margin:8px 0 0;font-size:13px">Connecting…</p>
 </div></div>
 <div id="cm" hidden><b>Cheats</b>
@@ -150,36 +85,51 @@ label{display:block;text-align:left;font-size:12px;color:var(--mut);margin:2px 2
 <button data-c="mass">+100 mass</button>
 <button data-c="pup">Summon powerup</button>
 <button data-c="x">Close</button></div>
+<div id="bn" hidden></div>
+<button id="mnb" hidden title="Back to menu (Esc)">☰ Menu</button>
+<div id="cf" hidden role="dialog" aria-modal="true" aria-labelledby="cft"><div><h2 id="cft">Back to menu?</h2><p id="cfp"></p><button id="cfn">Keep playing</button><button id="cfy">Leave and lose progress</button></div></div>
 <div id="ver"></div>
 <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <script>
-const VERSION="1.4",W=3000,$=i=>document.getElementById(i),cv=$('c'),g=cv.getContext('2d'),mg=$('mm').getContext('2d');
+let W=3000;const VERSION="1.6",$=i=>document.getElementById(i),cv=$('c'),g=cv.getContext('2d'),mg=$('mm').getContext('2d');
 let dpr=1,vw=0,vh=0;
 function rs(){dpr=Math.min(devicePixelRatio||1,2);vw=innerWidth;vh=innerHeight;cv.width=vw*dpr;cv.height=vh*dpr}
 addEventListener('resize',rs);rs();
 const rnd=(a,b)=>a+Math.random()*(b-a),R=m=>4*Math.sqrt(m),sp=m=>300*Math.pow(m,-.15),cl=(v,a,b)=>Math.max(a,Math.min(b,v));
 const col=h=>`hsl(${h} 70% 56%)`;
+const MAPS=[{n:'Meadow',w:3000,p:450},{n:'Neon Pit',w:1900,p:260,pal:{bg:'#0d0b1f',grid:'#1e1a45',wall:'#ff3fa4'}}];let mapI=0;
 const T={bg:'#eee',grid:'#ddd',wall:'#e5484d'};
-function th(){const s=getComputedStyle(document.documentElement);T.bg=s.getPropertyValue('--bg').trim();T.grid=s.getPropertyValue('--grid').trim();T.wall=s.getPropertyValue('--wall').trim()}
+function th(){const s=getComputedStyle(document.documentElement);T.bg=s.getPropertyValue('--bg').trim();T.grid=s.getPropertyValue('--grid').trim();T.wall=s.getPropertyValue('--wall').trim();if(MAPS[mapI].pal)Object.assign(T,MAPS[mapI].pal)}
 th();matchMedia('(prefers-color-scheme:dark)').addEventListener('change',th);
- 
+
 // ---- saved settings ----
 let sv={};try{sv=JSON.parse(localStorage.getItem('blobz')||'{}')}catch(e){}
 let best=+sv.b||0;
-const me={x:W/2,y:W/2,m:20,h:Number.isFinite(+sv.h)&&sv.h!==undefined?+sv.h:Math.floor(rnd(0,360)),life:0,alive:false,name:''};
-const save=()=>{try{localStorage.setItem('blobz',JSON.stringify({n:me.name,h:me.h,b:best}))}catch(e){}};
+const me={x:W/2,y:W/2,m:20,h:Number.isFinite(+sv.h)&&sv.h!==undefined?+sv.h:Math.floor(rnd(0,360)),life:0,pt:0,alive:false,name:''};
+const save=()=>{try{localStorage.setItem('blobz',JSON.stringify({n:me.name,h:me.h,b:best,em:slots}))}catch(e){}};
 $('nm').value=sv.n||'';$('hue').value=me.h;$('h1').style.color=col(me.h);
 $('hue').oninput=e=>{me.h=+e.target.value;$('h1').style.color=col(me.h)};
 const cleanRoom=s=>(s||'').toLowerCase().replace(/[^a-z0-9-]/g,'').slice(0,20)||'main';
 $('rm').value=cleanRoom(location.hash.slice(1));
- 
+
 // ---- world ----
-const pel=Array.from({length:450},()=>({x:rnd(0,W),y:rnd(0,W),h:rnd(0,360)}));
-const EM=['👋','😂','😠','😮','💜'],NAMES=['Pip','Moss','Zed','Orb','Juno','Kit'],PK=['bolt','shield','mass'],PI={bolt:'⚡',shield:'🛡',mass:'✚'},PC={bolt:'#f5a623',shield:'#3aa8ff',mass:'#35c76f'};
-const mkbot=(i,id,l)=>({id,l:l||0,x:rnd(0,W),y:rnd(0,W),m:rnd(15,50),h:rnd(0,360),vx:0,vy:0,ux:0,uy:0,t:0,n:NAMES[i]});
-const H={bots:[],pups:[],nid:1,tp:3,last:0};   // simulated only by the room host
-NAMES.forEach((_,i)=>H.bots.push(mkbot(i,i+1)));
-const fx={bolt:0,shield:0},ch={god:0,fast:0,wide:0};
+const pel=[];
+function setMap(i){mapI=i;W=MAPS[i].w;th();pel.length=0;for(let k=0;k<MAPS[i].p;k++)pel.push({x:rnd(0,W),y:rnd(0,W),h:rnd(0,360)});me.x=cl(me.x,0,W);me.y=cl(me.y,0,W);for(const b of H.bots){b.x=cl(b.x,0,W);b.y=cl(b.y,0,W)}}
+const POOL=['👋','😂','😠','😮','💜','👍','👎','😭','😎','🤔','🎉','🔥','💀','🙏','😴','🤝','👀','😈','🥳','😱','❤️','💩','🤡','✌️','😅','🤣','😍','😘','🥺','😤','🤯','🤪','😇','🙃','😬','🤫','🤭','🥶','🥵','🤢','🤑','🤖','👻','👽','💪','👏','🙌','🤞','💔','💯','💥','🌈','⭐','🍀','🍕','🎮','🏆','🚀','🧠','😳','😏','🤷','🙈','🐢','🍉','🎯','💎'],MODES=['Classic','Rush','Hill'];
+const PK=['bolt','shield','mass','magnet','feast','scope','nitro','burst','radar','grow'],PI={bolt:'⚡',shield:'🛡',mass:'✚',magnet:'🧲',feast:'🍎',scope:'🔭',nitro:'🚀',burst:'💥',radar:'📡',grow:'🌱'},PC={bolt:'#f5a623',shield:'#3aa8ff',mass:'#35c76f',magnet:'#e0457b',feast:'#e8542a',scope:'#9b6bff',nitro:'#17c3b2',burst:'#ff3b30',radar:'#7a8599',grow:'#b8d62a'},PD={bolt:8,shield:8,magnet:8,feast:10,scope:12,nitro:8,radar:14,grow:8};
+const BN='Pip Moss Zed Orb Juno Kit Nova Bix Taco Wisp Rex Lumi Fizz Gus Mochi Pixel Echo Blip Sunny Cosmo Dot Rune Yuki Otto Pepper Zig Mango Flux Nimbus Tofu Jinx Ember Luna Milo Ziggy Hugo Ivy Koa Mira Nico Odin Pia Quinn Rosa Sora Tilly Uma Vex Wren Yara Zola Abe Bo Cleo Dax Elf Finn Gigi Hana Ines Jax Kai Lola Maya Ned Opal Pru Rio Sage Tess Ugo Vera Wes Xena Yago Zane Boba Churro Dumpling Egg Fudge Gizmo Hobbit Iggy Jelly Koala Lemon Nacho Olive Pickle Quokka Ramen Sushi Waffle'.split(' '),
+BA='Sneaky Fuzzy Salty Sleepy Spicy Cosmic Wobbly Tiny Mighty Lazy Jolly Grumpy Silent Crispy Dizzy Cranky Bouncy Frosty Quirky Rusty Turbo Hungry Wild Zesty Dusty Mellow Rapid Shady Peppy Misty Giddy Plucky Fluffy Chilly Moody Nifty Lucky'.split(' '),
+BO='Waffle Pickle Muffin Walrus Badger Toast Noodle Goblin Comet Pebble Biscuit Falcon Otter Cactus Turnip Gecko Yeti Llama Panda Mango Radish Kiwi Bagel Raven Squid Taco Wombat Dragon Pretzel Robot Sprout Cobra Dingo Moose Lemur Puffin Ninja Pirate Wizard Cookie'.split(' '),
+BP='Lil Big Sir Dr Capt Mr Ms Uncle Aunt Chef Coach Baron'.split(' '),
+BF=['feed me','just vibing','pls dont eat','hi mom','snack time','nom nom nom','not a bot','send help','big mood','cant catch me','ur lunch','zoomies','one more try','oh no oh no','sry in advance'];
+const pk=a=>a[Math.random()*a.length|0],lt=t=>t.replace(/[aeio]/g,c=>({a:'4',e:'3',i:'1',o:'0'})[c]);
+function bname1(){const b=pk(BN),r=Math.random();
+  return r<.12?b:r<.22?b+(Math.random()<.5?(10+Math.random()*90|0):'0'+(1+Math.random()*9|0)):r<.3?pk(BP)+' '+b:r<.4?b.toLowerCase()+'_'+(1+Math.random()*99|0):r<.46?b.toUpperCase():r<.64?pk(BA)+pk(BO):r<.7?pk(BA).toLowerCase()+' '+pk(BO).toLowerCase():r<.76?'xX'+b+'Xx':r<.82?lt(b.toLowerCase()):r<.88?b+pk(['_gg','_tv','_xd','.exe','_jr','_irl']):pk(BF)}
+const bname=()=>{const used=new Set(H.bots.map(b=>b.n));let n;for(let i=0;i<10;i++){n=bname1();if(n.length<=14&&!used.has(n))return n}return n.slice(0,14)};
+const mkbot=(i,id,l)=>({id,l:l||0,x:rnd(0,W),y:rnd(0,W),m:rnd(15,50),h:rnd(0,360),vx:0,vy:0,ux:0,uy:0,t:0,n:bname()});
+const H={bots:[],pups:[],nid:1,tp:3,last:0,mode:0,pub:false,rend:0,hill:[1500,1500],ht:0};   // simulated only by the room host
+for(let i=0;i<6;i++)H.bots.push(mkbot(i,i+1));setMap(0);
+const fx={bolt:0,shield:0,magnet:0,feast:0,scope:0,nitro:0,radar:0,grow:0},rings=[],ch={god:0,fast:0,wide:0};
 const shielded=()=>ch.god||performance.now()<fx.shield;
 let ptr=null,boost=false;
 cv.addEventListener('pointermove',e=>{ptr=[e.clientX,e.clientY]});
@@ -189,17 +139,17 @@ addEventListener('keyup',e=>{if(e.code==='Space')boost=false});
 const bst=$('bst');
 bst.addEventListener('pointerdown',e=>{boost=true;bst.setPointerCapture(e.pointerId);e.preventDefault()});
 for(const ev of['pointerup','pointercancel','lostpointercapture'])bst.addEventListener(ev,()=>{boost=false});
- 
+
 // ---- multiplayer: PeerJS star network, the first player in a room hosts ----
 // Needs no server of your own. If the host leaves, a remaining player takes over.
 const PREFIX='blobz-gh-k7x2-';
 const net={state:'off',room:'main',peers:[],bots:[],pups:[],fail:0};
 let peer=null,myId=null,hostConn=null,isHost=false,gen=0;
 const conns=new Map(),roster=new Map();
-const toP=r=>({id:String(r[0]),n:String(r[1]||'Blob').slice(0,14),x:cl(+r[2]||0,0,W),y:cl(+r[3]||0,0,W),m:cl(+r[4]||20,10,6000),h:(+r[5]||0)%360,l:+r[6]||0,s:+r[7]?1:0,e:cl(+r[8]|0,0,EM.length)});
-const toBot=r=>({id:+r[0]||1,n:NAMES[(+r[0]||1)-1]||'Bot',x:cl(+r[1]||0,0,W),y:cl(+r[2]||0,0,W),m:cl(+r[3]||20,10,6000),h:(+r[4]||0)%360,l:+r[5]||0});
+const toP=r=>({id:String(r[0]),n:String(r[1]||'Blob').slice(0,14),x:cl(+r[2]||0,0,W),y:cl(+r[3]||0,0,W),m:cl(+r[4]||20,10,6000),h:(+r[5]||0)%360,l:+r[6]||0,s:+r[7]?1:0,e:cl(+r[8]|0,0,POOL.length),pt:+r[9]||0});
+const toBot=r=>({id:+r[0]||1,n:String(r[6]||'Bot').slice(0,14),x:cl(+r[1]||0,0,W),y:cl(+r[2]||0,0,W),m:cl(+r[3]||20,10,6000),h:(+r[4]||0)%360,l:+r[5]||0});
 const toU=r=>({id:+r[0],k:PK[+r[1]]||'mass',x:cl(+r[2]||0,0,W),y:cl(+r[3]||0,0,W)});
-function teardown(){try{peer&&peer.destroy()}catch(e){}peer=hostConn=null;isHost=false;conns.clear();roster.clear();net.peers=[];net.bots=[];net.pups=[]}
+function teardown(){try{peer&&peer.destroy()}catch(e){}try{dirP&&dirP.destroy()}catch(e){}dirP=null;peer=hostConn=null;isHost=false;conns.clear();roster.clear();net.peers=[];net.bots=[];net.pups=[]}
 function retry(my){
   if(my!==gen)return;
   teardown();
@@ -211,7 +161,7 @@ function connect(room){teardown();net.room=room;net.fail=0;net.state='connecting
 function start(room,my){
   if(!window.Peer){net.state='off';return}
   const hid=PREFIX+room,p=peer=new Peer(hid);
-  p.on('open',()=>{if(my!==gen)return;isHost=true;myId=hid;net.state='live';net.fail=0});
+  p.on('open',()=>{if(my!==gen)return;isHost=true;myId=hid;net.state='live';net.fail=0;hostCfg()});
   p.on('connection',c=>{
     const drop=()=>{conns.delete(c.peer);roster.delete(c.peer)};
     conns.set(c.peer,c);
@@ -222,13 +172,14 @@ function start(room,my){
       else if(d.t==='c')spawnPup(roster.get(c.peer)?.r);
       else if(d.t==='s'){
         if(!d.a){roster.delete(c.peer);return}
-        roster.set(c.peer,{r:[c.peer,d.n,d.x,d.y,d.m,d.h,d.l,d.s,d.e],seen:performance.now()});
+        roster.set(c.peer,{r:[c.peer,d.n,d.x,d.y,d.m,d.h,d.l,d.s,d.e,d.pt],seen:performance.now()});
       }
     });
     c.on('close',drop);c.on('error',drop);
   });
   p.on('error',e=>{
     if(my!==gen)return;
+    if(isHost&&e.type==='peer-unavailable')return;
     if(e.type==='unavailable-id'){try{p.destroy()}catch(x){}joinAs(hid,my)}
     else retry(my);
   });
@@ -245,7 +196,8 @@ function joinAs(hid,my){
         net.peers=d.p.slice(0,60).filter(r=>Array.isArray(r)&&r[0]!==myId).map(toP);
         if(Array.isArray(d.b))net.bots=d.b.slice(0,20).map(toBot);
         if(Array.isArray(d.u))net.pups=d.u.slice(0,20).map(toU);
-      }else if(d.t==='p')grant(d.k);
+        if(Array.isArray(d.g))applyG(d.g);
+      }else if(d.t==='p')grant(d.k);else if(d.t==='w')onWin(String(d.n||'').slice(0,14));
     });
     c.on('close',()=>retry(my));
     setTimeout(()=>{if(my===gen&&!c.open)retry(my)},9000);
@@ -257,21 +209,73 @@ setInterval(()=>{
   const now=performance.now(),list=[];
   for(const[k,v]of roster){if(now-v.seen>4000)roster.delete(k);else list.push(v.r)}
   net.peers=list.map(toP);
-  if(me.alive)list.push([myId,me.name,Math.round(me.x),Math.round(me.y),Math.round(me.m),me.h,me.life,shielded()?1:0,curEm()]);
+  if(me.alive)list.push([myId,me.name,Math.round(me.x),Math.round(me.y),Math.round(me.m),me.h,me.life,shielded()?1:0,curEm(),Math.round(me.pt)]);
   hostSim(Math.min((now-(H.last||now))/1000,.25));H.last=now;
-  const msg={t:'r',p:list,b:H.bots.map(b=>[b.id,Math.round(b.x),Math.round(b.y),Math.round(b.m),b.h|0,b.l]),u:H.pups.map(u=>[u.id,PK.indexOf(u.k),Math.round(u.x),Math.round(u.y)])};
+  const msg={t:'r',p:list,b:H.bots.map(b=>[b.id,Math.round(b.x),Math.round(b.y),Math.round(b.m),b.h|0,b.l,b.n]),g:[H.mode,mapI,Math.max(0,Math.round((H.rend-now)/1000)),Math.round(H.hill[0]),Math.round(H.hill[1])],u:H.pups.map(u=>[u.id,PK.indexOf(u.k),Math.round(u.x),Math.round(u.y)])};
   for(const c of conns.values())if(c.open)try{c.send(msg)}catch(e){}
 },50);
 function push(){
   if(!hostConn||!hostConn.open)return;
-  try{hostConn.send(me.alive?{t:'s',a:1,n:me.name,x:Math.round(me.x),y:Math.round(me.y),m:Math.round(me.m),h:me.h,l:me.life,s:shielded()?1:0,e:curEm()}:{t:'s',a:0})}catch(e){}
+  try{hostConn.send(me.alive?{t:'s',a:1,n:me.name,x:Math.round(me.x),y:Math.round(me.y),m:Math.round(me.m),h:me.h,l:me.life,s:shielded()?1:0,e:curEm(),pt:Math.round(me.pt)}:{t:'s',a:0})}catch(e){}
 }
 const vis=new Map(),ate=new Set(),pend=new Set();
+// ---- room settings, rounds, room browser ----
+const HR=240,LOBBY=PREFIX+'@dir',dirMap=new Map();let dirP=null,bt=0;
+const MODE=()=>isHost?H.mode:(net.mode||0),HILL=()=>isHost?H.hill:(net.hill||[0,0]);
+const REM=()=>isHost?Math.max(0,(H.rend-performance.now())/1000):Math.max(0,(net.rem||0)-(performance.now()-(net.remAt||0))/1000);
+const fmt=t=>(t/60|0)+':'+String(t%60|0).padStart(2,'0');
+function hostCfg(){H.pub=$('pub').checked;H.mode=+$('mo').value;if(mapI!==+$('mp').value)setMap(+$('mp').value);H.rend=performance.now()+180000;H.hill=[W/2,W/2];H.ht=0}
+function applyG(g){const mp=cl(+g[1]|0,0,MAPS.length-1);if(mp!==mapI)setMap(mp);net.mode=cl(+g[0]|0,0,2);net.rem=+g[2]||0;net.remAt=performance.now();net.hill=[+g[3]||0,+g[4]||0]}
+function banner(t){const b=$('bn');b.textContent=t;b.hidden=false;clearTimeout(bt);bt=setTimeout(()=>{b.hidden=true},5000)}
+function onWin(name){banner(name?name+' wins the round!':'Round over');me.pt=0;if(me.alive){me.x=rnd(300,W-300);me.y=rnd(300,W-300);me.m=20;me.life++}}
+function endRound(name){
+  H.rend=performance.now()+180000;H.ht=0;
+  H.bots.forEach((b,i)=>Object.assign(b,mkbot(i,b.id,b.l+1)));
+  for(const c of conns.values())if(c.open)try{c.send({t:'w',n:name})}catch(e){}
+  onWin(name);
+}
+// Public rooms register with a directory. The first public host to find none holds it (a fixed PeerJS id).
+const dirList=()=>[...dirMap.values()].filter(v=>performance.now()-v.t<25000).map(v=>v.i);
+function dirReg(){
+  if(!isHost||!H.pub||!peer||!window.Peer)return;
+  const i={r:net.room,mo:H.mode,mp:mapI,n:net.peers.length+(me.alive?1:0)};
+  if(dirP){dirMap.set(i.r,{i,t:performance.now()});return}
+  let ok=false;const c=peer.connect(LOBBY);
+  c.on('open',()=>{ok=true;c.send({t:'reg',i});setTimeout(()=>c.close(),1500)});
+  setTimeout(()=>{if(!ok&&!dirP&&isHost)claimDir()},4000);
+}
+function claimDir(){
+  const d=new Peer(LOBBY);
+  d.on('open',()=>{dirP=d});
+  d.on('error',()=>{try{d.destroy()}catch(e){}if(dirP===d)dirP=null});
+  d.on('connection',c=>c.on('data',m=>{
+    if(!m)return;
+    if(m.t==='reg'&&m.i&&typeof m.i.r==='string'){const r=m.i.r.slice(0,20);dirMap.set(r,{i:{r,mo:+m.i.mo|0,mp:+m.i.mp|0,n:+m.i.n|0},t:performance.now()})}
+    else if(m.t==='list')try{c.send({t:'l',l:dirList()})}catch(e){}
+  }));
+}
+setInterval(dirReg,8000);
+function browse(){
+  const L=$('rl');L.textContent='Searching…';
+  const show=l=>{
+    L.textContent='';
+    if(!l.length){L.textContent='No public rooms right now. Create one and tick “Public room”.';return}
+    for(const x of l)mk(String(x.r).slice(0,20)+' · '+(MODES[x.mo]||'?')+' · '+((MAPS[x.mp]||{}).n||'?')+' · '+(+x.n||0)+' playing',()=>{$('rm').value=cleanRoom(x.r);$('go').click()},L);
+  };
+  if(dirP){show(dirList());return}
+  if(!window.Peer){L.textContent='Needs a connection to the PeerJS service.';return}
+  let done=false;const p=new Peer();
+  const fin=l=>{if(done)return;done=true;show(l);try{p.destroy()}catch(e){}};
+  p.on('open',()=>{const c=p.connect(LOBBY);c.on('open',()=>c.send({t:'list'}));c.on('data',m=>{if(m&&m.t==='l'&&Array.isArray(m.l))fin(m.l.slice(0,30))})});
+  p.on('error',()=>fin([]));setTimeout(()=>fin([]),6000);
+}
+$('br').onclick=browse;
 setInterval(()=>pend.clear(),2000);
 const send=m=>{if(hostConn&&hostConn.open)try{hostConn.send(m)}catch(e){}};
-function spawnPup(at){H.pups.push({id:H.nid++,k:PK[Math.random()*3|0],x:at?cl(+at[2]+rnd(-120,120),0,W):rnd(150,W-150),y:at?cl(+at[3]+rnd(-120,120),0,W):rnd(150,W-150)})}
+function spawnPup(at){H.pups.push({id:H.nid++,k:PK[Math.random()*PK.length|0],x:at?cl(+at[2]+rnd(-120,120),0,W):rnd(150,W-150),y:at?cl(+at[3]+rnd(-120,120),0,W):rnd(150,W-150)})}
 function botEaten(id){const b=H.bots.find(q=>q.id===id);if(b)Object.assign(b,mkbot(id-1,id,b.l+1))}
-function grant(k){if(k==='mass')me.m+=30;else if(k==='bolt')fx.bolt=performance.now()+8000;else fx.shield=performance.now()+8000}
+function burst(){const t=performance.now();for(const q of pel)if(Math.hypot(q.x-me.x,q.y-me.y)<650){me.m+=t<fx.feast?3:1;q.x=rnd(0,W);q.y=rnd(0,W)}rings.push({x:me.x,y:me.y,t})}
+function grant(k){if(k==='mass')me.m+=30;else if(k==='burst')burst();else if(PD[k])fx[k]=performance.now()+PD[k]*1000}
 function pickup(id,c){
   const i=H.pups.findIndex(u=>u.id===id);if(i<0)return;
   const k=H.pups.splice(i,1)[0].k;
@@ -305,7 +309,12 @@ function think(b,pl){
 }
 function hostSim(dt){
   H.tp-=dt;
-  if(H.tp<=0){H.tp=rnd(5,9);if(H.pups.length<6)spawnPup()}
+  if(H.mode===1&&performance.now()>H.rend){let w=null;for(const p of[...net.peers,...(me.alive?[{n:me.name,m:me.m}]:[])])if(!w||p.m>w.m)w=p;endRound(w?w.n:'')}
+  if(H.mode===2){
+    H.ht-=dt;if(H.ht<=0){H.ht=25;H.hill=[rnd(400,W-400),rnd(400,W-400)]}
+    const w=net.peers.find(p=>p.pt>=60)||(me.alive&&me.pt>=60?{n:me.name}:null);if(w)endRound(w.n);
+  }
+  if(H.tp<=0){H.tp=rnd(4,8);if(H.pups.length<8)spawnPup()}
   const pl=net.peers.map(p=>({id:p.id,x:p.x,y:p.y,m:p.m,l:p.l,s:p.s}));
   if(me.alive)pl.push({id:myId,x:me.x,y:me.y,m:me.m,l:me.life,s:shielded()?1:0});
   for(const b of H.bots){
@@ -314,19 +323,20 @@ function hostSim(dt){
     b.vx+=(b.ux*v-b.vx)*k;b.vy+=(b.uy*v-b.vy)*k;
     b.x=cl(b.x+b.vx*dt,0,W);b.y=cl(b.y+b.vy*dt,0,W);
     eatPellets(b);
-    for(let i=H.pups.length-1;i>=0;i--)if(Math.hypot(H.pups[i].x-b.x,H.pups[i].y-b.y)<R(b.m)){H.pups.splice(i,1);b.m+=15}
+    for(let i=H.pups.length-1;i>=0;i--)if(Math.hypot(H.pups[i].x-b.x,H.pups[i].y-b.y)<R(b.m)+36){H.pups.splice(i,1);b.m+=15}
     for(const c of H.bots)if(c!==b&&swallow(b,c)){b.m+=c.m*.8;Object.assign(c,mkbot(c.id-1,c.id,c.l+1))}
     for(const p of pl)if(!p.s&&swallow(b,p)){const key='x'+b.id+':'+p.id+':'+p.l;if(!ate.has(key)){ate.add(key);b.m+=p.m*.5}}
     if(b.m>80)b.m-=b.m*.01*dt;
   }
 }
- 
+
 // ---- game ----
 const swallow=(a,b)=>a.m>b.m*1.12&&Math.hypot(a.x-b.x,a.y-b.y)<R(a.m)-R(b.m)*.4;
-function eatPellets(o){for(const q of pel)if(Math.hypot(q.x-o.x,q.y-o.y)<R(o.m)){o.m+=1;q.x=rnd(0,W);q.y=rnd(0,W)}}
-function spawn(){me.x=rnd(300,W-300);me.y=rnd(300,W-300);me.m=20;me.life++;me.alive=true;ptr=null}
+function eatPellets(o){for(const q of pel)if(Math.hypot(q.x-o.x,q.y-o.y)<R(o.m)){o.m+=(o===me&&performance.now()<fx.feast)?3:1;q.x=rnd(0,W);q.y=rnd(0,W)}}
+const syncUi=()=>{$('mnb').hidden=!me.alive};
+function spawn(){me.x=rnd(300,W-300);me.y=rnd(300,W-300);me.m=20;me.life++;me.alive=true;ptr=null;syncUi()}
 function die(by){
-  me.alive=false;
+  me.alive=false;$('cf').hidden=true;syncUi();
   const score=Math.round(me.m),rec=score>best;if(rec){best=score;save()}
   $('msg').textContent=by+' swallowed you at mass '+score+(rec?'. New best!':'. Best: '+best+'.');
   $('go').textContent='Play again';$('ov').style.display='flex';push();
@@ -334,47 +344,64 @@ function die(by){
 $('go').onclick=()=>{
   me.name=($('nm').value.trim()||'Blob').slice(0,14);
   const r=cleanRoom($('rm').value);$('rm').value=r;
-  if(r!==net.room||net.state==='off')connect(r);
+  if(r!==net.room||net.state==='off')connect(r);else if(isHost&&net.peers.length===0)hostCfg();
   history.replaceState(null,'','#'+r);
   save();spawn();$('ov').style.display='none';push();
 };
 $('nm').addEventListener('keydown',e=>{if(e.key==='Enter')$('go').click()});
- 
+
+function askMenu(){if(!me.alive)return;$('cfp').textContent='You are at mass '+Math.round(me.m)+'. Leaving ends this run and you start over at mass 20. The game keeps running while you decide.';$('cf').hidden=false;$('cfn').focus()}
+function toMenu(){
+  $('cf').hidden=true;if(!me.alive)return;
+  const sc=Math.round(me.m);if(sc>best){best=sc;save()}
+  me.alive=false;boost=false;ptr=null;syncUi();
+  $('msg').textContent='You left at mass '+sc+'. Best: '+best+'. Change your name, colour or room, then play again.';
+  $('go').textContent='Play';$('ov').style.display='flex';push();
+}
+$('mnb').onclick=askMenu;$('cfn').onclick=()=>{$('cf').hidden=true};$('cfy').onclick=toMenu;
+addEventListener('keydown',e=>{if(e.key==='Escape'&&!e.repeat){if(!$('cf').hidden)$('cf').hidden=true;else askMenu()}});
 let last=performance.now(),lastPush=0,lastHud=0;
 function tick(now){
   const dt=Math.min((now-last)/1000,.05);last=now;
   const peers=net.peers;
- 
+
   if(me.alive){
     if(ptr){const dx=ptr[0]-vw/2,dy=ptr[1]-vh/2,d=Math.hypot(dx,dy);
       if(d>6){
-        const bo=boost&&me.m>25,v=sp(me.m)*Math.min(1,d/80)*(bo?1.7:1)*(now<fx.bolt?1.6:1)*(ch.fast?2:1);
+        const nt=now<fx.nitro,bo=boost&&(me.m>25||nt),v=sp(me.m)*Math.min(1,d/80)*(bo?(nt?2.1:1.7):1)*(now<fx.bolt?1.6:1)*(ch.fast?2:1);
         me.x=cl(me.x+dx/d*v*dt,0,W);me.y=cl(me.y+dy/d*v*dt,0,W);
-        if(bo)me.m-=me.m*.05*dt;
+        if(bo&&!nt)me.m-=me.m*.05*dt;
       }}
+    if(now<fx.magnet)for(const q of pel){const dx=me.x-q.x,dy=me.y-q.y,d=Math.hypot(dx,dy);if(d<300&&d>1){q.x+=dx/d*420*dt;q.y+=dy/d*420*dt}}
+    if(MODE()===2){const h=HILL();if(Math.hypot(me.x-h[0],me.y-h[1])<HR)me.pt+=dt}
+    if(now<fx.grow)me.m+=Math.min(me.m*.06,12)*dt;
     eatPellets(me);
     for(const b of isHost?H.bots:net.bots){
       if(swallow(me,b)){const k='b'+b.id+':'+b.l;if(!ate.has(k)){ate.add(k);me.m+=b.m*.8;if(isHost)botEaten(b.id);else send({t:'e',b:b.id})}}
       else if(!shielded()&&swallow(b,me)){die(b.n);break}
     }
     for(const u of isHost?H.pups:net.pups){
-      if(Math.hypot(u.x-me.x,u.y-me.y)<R(me.m)+12&&!pend.has(u.id)){pend.add(u.id);if(isHost)pickup(u.id,null);else send({t:'u',id:u.id})}
+      if(Math.hypot(u.x-me.x,u.y-me.y)<R(me.m)+56&&!pend.has(u.id)){pend.add(u.id);if(isHost)pickup(u.id,null);else send({t:'u',id:u.id})}
     }
   }
   if(me.alive)for(const p of peers){
     if(swallow(me,p)&&!p.s){const k=p.id+':'+p.l;if(!ate.has(k)){ate.add(k);me.m+=p.m*.8}}
     else if(!shielded()&&swallow(p,me)){die(p.n);break}
   }
- 
- 
+
+
   if(me.alive&&now-lastPush>50){push();lastPush=now}
- 
+
+  const sc=p=>MODE()===2?p.pt:p.m;let kg=null,kv=0;
+  if(me.alive&&sc(me)>kv){kg='me';kv=sc(me)}
+  for(const p of peers)if(sc(p)>kv){kg=p.id;kv=sc(p)}
+  if(!peers.length)kg=null;
   const seen=new Set(),list=[];
   for(const p of peers){
     seen.add(p.id);
     const v=vis.get(p.id)||{x:p.x,y:p.y};
     const k=1-Math.exp(-dt*14);v.x+=(p.x-v.x)*k;v.y+=(p.y-v.y)*k;vis.set(p.id,v);
-    list.push({x:v.x,y:v.y,m:p.m,h:p.h,n:p.n,p:1,s:p.s,e:p.e});
+    list.push({x:v.x,y:v.y,m:p.m,h:p.h,n:p.n,p:1,s:p.s,e:p.e,k:p.id===kg});
   }
   for(const b of isHost?H.bots:net.bots){
     const key='b'+b.id;seen.add(key);
@@ -384,10 +411,10 @@ function tick(now){
     list.push({x:v.x,y:v.y,m:b.m,h:b.h,n:b.n});
   }
   for(const id of vis.keys())if(!seen.has(id))vis.delete(id);
-  if(me.alive)list.push({x:me.x,y:me.y,m:me.m,h:me.h,n:me.name,me:1,s:shielded()?1:0,e:curEm()});
+  if(me.alive)list.push({x:me.x,y:me.y,m:me.m,h:me.h,n:me.name,me:1,s:shielded()?1:0,e:curEm(),k:kg==='me'});
   list.sort((a,b)=>a.m-b.m);
- 
-  const z=Math.max(.3,1.15-Math.sqrt(me.m)*.022)*(ch.wide?.55:1);
+
+  const z=Math.max(.3,1.15-Math.sqrt(me.m)*.022)*(ch.wide||now<fx.scope?.55:1);
   g.setTransform(dpr,0,0,dpr,0,0);
   g.fillStyle=T.grid;g.fillRect(0,0,vw,vh);
   g.translate(vw/2,vh/2);g.scale(z,z);g.translate(-me.x,-me.y);
@@ -402,51 +429,73 @@ function tick(now){
     if(q.x<x0-10||q.x>x1+10||q.y<y0-10||q.y>y1+10)continue;
     g.fillStyle=col(q.h);g.beginPath();g.arc(q.x,q.y,5,0,6.2832);g.fill();
   }
+  if(MODE()===2){const h=HILL();g.fillStyle='rgba(255,200,40,.18)';g.beginPath();g.arc(h[0],h[1],HR,0,6.2832);g.fill();g.lineWidth=5/z;g.strokeStyle='rgba(255,190,30,.9)';g.stroke()}
   for(const u of isHost?H.pups:net.pups){
-    if(u.x<x0-30||u.x>x1+30||u.y<y0-30||u.y>y1+30)continue;
-    g.fillStyle=PC[u.k];g.beginPath();g.arc(u.x,u.y,14+Math.sin(now/200+u.id)*2,0,6.2832);g.fill();
-    g.font='18px system-ui,sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillStyle='#fff';g.fillText(PI[u.k],u.x,u.y+1);
+    if(u.x<x0-80||u.x>x1+80||u.y<y0-80||u.y>y1+80)continue;
+    const pu=Math.sin(now/200+u.id),ur=40+pu*4;
+    g.globalAlpha=.25+.1*pu;g.fillStyle=PC[u.k];g.beginPath();g.arc(u.x,u.y,ur+20,0,6.2832);g.fill();g.globalAlpha=1;
+    g.fillStyle=PC[u.k];g.beginPath();g.arc(u.x,u.y,ur,0,6.2832);g.fill();g.lineWidth=5;g.strokeStyle='#fff';g.stroke();
+    g.font='52px system-ui,sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillStyle='#fff';g.fillText(PI[u.k],u.x,u.y+3);
   }
-  const bo=boost&&me.alive&&me.m>25;
+  for(let i=rings.length-1;i>=0;i--){const a=(now-rings[i].t)/600;if(a>1){rings.splice(i,1);continue}g.globalAlpha=1-a;g.lineWidth=(10*(1-a)+2)/z;g.strokeStyle='#ff6a3d';g.beginPath();g.arc(rings[i].x,rings[i].y,650*a,0,6.2832);g.stroke();g.globalAlpha=1}
+  const bo=boost&&me.alive&&(me.m>25||now<fx.nitro);
   for(const o of list){
     const r=R(o.m);
     if(o.x+r<x0||o.x-r>x1||o.y+r<y0||o.y-r>y1)continue;
     g.fillStyle=col(o.h);g.beginPath();g.arc(o.x,o.y,r,0,6.2832);g.fill();
     g.lineWidth=Math.max(2,r*(o.me&&bo?.18:.08));g.strokeStyle=o.me?'#fff':'rgba(0,0,0,.25)';g.stroke();
-    if(o.s){g.lineWidth=4;g.strokeStyle='rgba(90,190,255,.9)';g.beginPath();g.arc(o.x,o.y,r+6,0,6.2832);g.stroke()}
+    const sl=o.me&&!ch.god?fx.shield-now:1e9;
+    if(o.s&&(sl>2000||((now/140|0)%2))){
+      const pu=Math.sin(now/130)*.5+.5,rr=r+18+pu*5,gr=g.createRadialGradient(o.x,o.y,r*.7,o.x,o.y,rr);
+      gr.addColorStop(0,'rgba(79,195,255,0)');gr.addColorStop(.75,'rgba(79,195,255,.4)');gr.addColorStop(1,'rgba(170,235,255,.85)');
+      g.fillStyle=gr;g.beginPath();g.arc(o.x,o.y,rr,0,6.2832);g.fill();
+      g.lineWidth=(7+pu*3)/z;g.strokeStyle='#2bb4ff';g.stroke();
+      g.save();g.setLineDash([20,14]);g.lineDashOffset=-now/25;g.lineWidth=3.5/z;g.strokeStyle='#fff';g.beginPath();g.arc(o.x,o.y,r+8,0,6.2832);g.stroke();g.restore();
+      const bs=Math.max(24,r*.6);g.font=bs+'px system-ui,sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText('🛡',o.x+r*.75,o.y-r*.75);
+    }
     const fs=Math.max(11,r*.45);g.font=`700 ${fs}px ui-rounded,system-ui,sans-serif`;
     g.textAlign='center';g.textBaseline='middle';g.lineWidth=fs*.18;g.strokeStyle='rgba(0,0,0,.45)';
     g.strokeText(o.n,o.x,o.y);g.fillStyle='#fff';g.fillText(o.n,o.x,o.y);
-    if(o.e){const es=Math.max(26,r*.8);g.font=es+'px system-ui,sans-serif';g.fillText(EM[o.e-1],o.x,o.y-r-es*.7+Math.sin(now/150)*3)}
+    if(o.k){const cs=Math.max(28,r*.8);g.font=cs+'px system-ui,sans-serif';g.fillText('👑',o.x,o.y-r-cs*.2+Math.sin(now/220)*3)}
+    if(o.e){const es=Math.max(26,r*.8);g.font=es+'px system-ui,sans-serif';g.fillText((POOL[o.e-1]||''),o.x,o.y-r-es*.7-(o.k?es:0)+Math.sin(now/150)*3)}
   }
- 
+
   // minimap
   mg.clearRect(0,0,96,96);
+  if(MODE()===2){const h=HILL();mg.fillStyle='rgba(255,190,30,.8)';mg.beginPath();mg.arc(h[0]/W*96,h[1]/W*96,Math.max(3,HR/W*96),0,6.2832);mg.fill()}
+  const rd=now<fx.radar;
+  if(rd)for(const u of isHost?H.pups:net.pups){mg.fillStyle=PC[u.k];mg.beginPath();mg.arc(u.x/W*96,u.y/W*96,2.5,0,6.2832);mg.fill();mg.lineWidth=1;mg.strokeStyle='#fff';mg.stroke()}
   for(const o of list){
-    if(o.n&&!o.p&&!o.me)continue;
-    mg.fillStyle=o.me?'#fff':col(o.h);mg.beginPath();mg.arc(o.x/W*96,o.y/W*96,o.me?4:3,0,6.2832);mg.fill();
+    if(o.n&&!o.p&&!o.me&&!rd)continue;
+    mg.fillStyle=o.me?'#fff':rd?(o.m>me.m*1.12?'#ff3b30':o.m*1.12<me.m?'#35c76f':'#f5a623'):col(o.h);mg.beginPath();mg.arc(o.x/W*96,o.y/W*96,o.me?4:3,0,6.2832);mg.fill();
     if(o.me){mg.lineWidth=2;mg.strokeStyle=col(o.h);mg.stroke()}
   }
- 
+
   if(now-lastHud>300){
     lastHud=now;
     const n=peers.length+(me.alive?1:0),t=performance.now();
-    const eff=(t<fx.bolt?' ⚡'+Math.ceil((fx.bolt-t)/1000):'')+(ch.god?' 🛡∞':t<fx.shield?' 🛡'+Math.ceil((fx.shield-t)/1000):'');
-    const rows=peers.map(p=>[p.n,p.m,0]);if(me.alive)rows.push([me.name,me.m,1]);
+    const eff=Object.keys(fx).map(k=>k==='shield'&&ch.god?' 🛡∞':t<fx[k]?' '+PI[k]+Math.ceil((fx[k]-t)/1000):'').join('');
+    const rows=peers.map(p=>[p.n,sc(p),0]);if(me.alive)rows.push([me.name,sc(me),1]);
     rows.sort((a,b)=>b[1]-a[1]);
-    $('lb').textContent=rows.slice(0,5).map((r,i)=>(r[2]?'▸ ':'   ')+(i+1)+'. '+r[0]+'  '+Math.round(r[1])).join('\n')||'No players yet';
-    $('st').textContent='Mass '+(me.alive?Math.round(me.m):0)+'  Best '+best+eff+'\n'+n+' online · room '+net.room;
+    const lb=$('lb');lb.textContent='';if(!rows.length)lb.textContent='No players yet';rows.slice(0,5).forEach((r,i)=>{const d=document.createElement('div');d.textContent=(r[2]?'▸ ':'   ')+(i?(i+1)+'.':'👑')+' '+r[0]+'  '+Math.round(r[1]);if(!i)d.className='k1';lb.appendChild(d)});
+    $('st').textContent='Mass '+(me.alive?Math.round(me.m):0)+'  Best '+best+eff+'\n'+n+' online · room '+net.room+'\n'+MODES[MODE()]+(MODE()===1?' '+fmt(REM()):'')+(MODE()===2?' · '+Math.round(me.pt)+'/60 pts':'');
     $('net').textContent=net.state==='off'?'Offline: playing against bots.':net.state==='connecting'?'Connecting…':'Live in room “'+net.room+'”: '+n+' playing. Share this page’s link to invite friends.';
   }
   requestAnimationFrame(tick);
 }
-// Emotes: keys 1-5 or the emoji button; shown above your blob for 2.5 s to everyone in the room.
-let emUntil=0,emK=0,emLast=0;
+// Emotes: pick 5 in the Emotes section of the start card; keys 1-5 or the 😀 button; everyone in the room sees them.
+let slots=Array.isArray(sv.em)&&sv.em.length===5?sv.em.map(x=>cl(+x|0,0,POOL.length-1)):[0,1,2,3,4],sel=0,emUntil=0,emK=0,emLast=0;
 const curEm=()=>performance.now()<emUntil?emK:0;
-function emote(k){const t=performance.now();if(!me.alive||t-emLast<1200)return;emLast=t;emK=k;emUntil=t+2500;$('emr').hidden=true;push()}
+function emote(i){const t=performance.now();if(!me.alive||t-emLast<100)return;emLast=t;emK=slots[i]+1;emUntil=t+2500;$('emr').hidden=true;push()}
+function mk(txt,fn,par,cls){const b=document.createElement('button');b.textContent=txt;b.onclick=fn;if(cls)b.className=cls;par.appendChild(b);return b}
+function buildEm(){
+  for(const id of['es','ep','emr'])$(id).textContent='';
+  slots.forEach((k,i)=>{mk(POOL[k],()=>{sel=i;buildEm()},$('es'),i===sel?'on':'');mk(POOL[k],()=>emote(i),$('emr'))});
+  POOL.forEach((e,k)=>mk(e,()=>{slots[sel]=k;sel=(sel+1)%5;save();buildEm()},$('ep')));
+}
 $('emt').onclick=()=>{$('emr').hidden=!$('emr').hidden};
-EM.forEach((e,i)=>{const b=document.createElement('button');b.textContent=e;b.setAttribute('aria-label','Emote '+(i+1));b.onclick=()=>emote(i+1);$('emr').appendChild(b)});
-addEventListener('keydown',e=>{if(e.target.tagName==='INPUT')return;const n=+e.key;if(n>=1&&n<=EM.length)emote(n)});
+addEventListener('keydown',e=>{if(e.target.tagName==='INPUT')return;const n=+e.key;if(n>=1&&n<=5)emote(n-1)});
+buildEm();
 $('ver').textContent='v'+VERSION;
 // Secret cheat menu: type cheat, or the Konami code, or tap the title / mass readout 7 times in 3 seconds.
 const cm=$('cm');
@@ -472,5 +521,3 @@ requestAnimationFrame(tick);
 </script>
 </body>
 </html>
- 
-Claude finished the response

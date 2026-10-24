@@ -1,45 +1,3 @@
-Claude
-Can you make an .io multiplayer online game?
-
-Read 2 files, ran a command, and 2 more tools
-Building a multiplayer .io game for you; the page is written, and I’m publishing it now.
-
-Blobz.io
-Artifact
-·Only you
-Yes. I built Blobz.io, an agar.io-style game: drag to steer, eat pellets, swallow smaller blobs, and avoid bigger ones.
-
-Everyone who opens the link at the same time shares one arena in real time. Only signed-in people can join the live room, so public-link visitors play against the bots instead. The bots only exist on your own screen. I haven’t playtested it with several people at once.
-
-I assumed the agar.io style. I can switch it to snake.io, add a team mode, or change the look if you’d prefer something else.
-
-adapt it for github it is hosted on github make mutiplayer work and after that add some few more features
-
-Created a file, ran a command, shared files
-I rebuilt it as a single index.html for GitHub Pages. The syntax checks out, but I couldn’t test the multiplayer here because I have no network access, so please try it with two browser tabs first.
-
-Multiplayer no longer depends on Claude. It now uses PeerJS (loaded from a CDN, no server of your own). The first player in a room becomes the host and relays everyone’s positions, and if the host leaves, another player takes over. If the PeerJS connection fails repeatedly, the game falls back to bots only.
-
-To deploy, commit index.html to a repo, then go to Settings → Pages and deploy from your main branch. Open the page in two tabs or on two devices and both should see each other.
-
-I added four features:
-
-Boost: hold Space or tap the Boost button to dash, at the cost of some mass.
-Minimap: shows the arena and where the other players are.
-Rooms: enter a room code on the start screen, and the page URL becomes …/#roomname, so you can send that link to friends for a private game.
-Colour and best score: pick your blob colour; your nickname, colour and best score are saved in the browser.
-Players on strict corporate or mobile networks may fail to connect, because there’s no relay server for those cases. If that happens, the fix is a small WebSocket server (for example on Render), which I can write if you want it.
-
-Index
-Code
-·HTML
-
-
-
-Claude is AI and can make mistakes. Please double-check responses.
-
-
-Index · HTML
 <!doctype html>
 <html lang="en">
 <head>
@@ -97,7 +55,7 @@ const col=h=>`hsl(${h} 70% 56%)`;
 const T={bg:'#eee',grid:'#ddd',wall:'#e5484d'};
 function th(){const s=getComputedStyle(document.documentElement);T.bg=s.getPropertyValue('--bg').trim();T.grid=s.getPropertyValue('--grid').trim();T.wall=s.getPropertyValue('--wall').trim()}
 th();matchMedia('(prefers-color-scheme:dark)').addEventListener('change',th);
- 
+
 // ---- saved settings ----
 let sv={};try{sv=JSON.parse(localStorage.getItem('blobz')||'{}')}catch(e){}
 let best=+sv.b||0;
@@ -107,7 +65,7 @@ $('nm').value=sv.n||'';$('hue').value=me.h;$('h1').style.color=col(me.h);
 $('hue').oninput=e=>{me.h=+e.target.value;$('h1').style.color=col(me.h)};
 const cleanRoom=s=>(s||'').toLowerCase().replace(/[^a-z0-9-]/g,'').slice(0,20)||'main';
 $('rm').value=cleanRoom(location.hash.slice(1));
- 
+
 // ---- world ----
 const pel=Array.from({length:450},()=>({x:rnd(0,W),y:rnd(0,W),h:rnd(0,360)}));
 const NAMES=['Pip','Moss','Zed','Orb','Juno','Kit'];
@@ -121,7 +79,7 @@ addEventListener('keyup',e=>{if(e.code==='Space')boost=false});
 const bst=$('bst');
 bst.addEventListener('pointerdown',e=>{boost=true;bst.setPointerCapture(e.pointerId);e.preventDefault()});
 for(const ev of['pointerup','pointercancel','lostpointercapture'])bst.addEventListener(ev,()=>{boost=false});
- 
+
 // ---- multiplayer: PeerJS star network, the first player in a room hosts ----
 // Needs no server of your own. If the host leaves, a remaining player takes over.
 const PREFIX='blobz-gh-k7x2-';
@@ -184,7 +142,7 @@ function push(){
   try{hostConn.send(me.alive?{t:'s',a:1,n:me.name,x:Math.round(me.x),y:Math.round(me.y),m:Math.round(me.m),h:me.h,l:me.life}:{t:'s',a:0})}catch(e){}
 }
 const vis=new Map(),ate=new Set();
- 
+
 // ---- game ----
 const swallow=(a,b)=>a.m>b.m*1.12&&Math.hypot(a.x-b.x,a.y-b.y)<R(a.m)-R(b.m)*.4;
 function eatPellets(o){for(const q of pel)if(Math.hypot(q.x-o.x,q.y-o.y)<R(o.m)){o.m+=1;q.x=rnd(0,W);q.y=rnd(0,W)}}
@@ -203,12 +161,12 @@ $('go').onclick=()=>{
   save();spawn();$('ov').style.display='none';push();
 };
 $('nm').addEventListener('keydown',e=>{if(e.key==='Enter')$('go').click()});
- 
+
 let last=performance.now(),lastPush=0,lastHud=0;
 function tick(now){
   const dt=Math.min((now-last)/1000,.05);last=now;
   const peers=net.peers;
- 
+
   if(me.alive){
     if(ptr){const dx=ptr[0]-vw/2,dy=ptr[1]-vh/2,d=Math.hypot(dx,dy);
       if(d>6){
@@ -227,7 +185,7 @@ function tick(now){
     if(swallow(me,p)){const k=p.id+':'+p.l;if(!ate.has(k)){ate.add(k);me.m+=p.m*.8}}
     else if(swallow(p,me)){die(p.n);break}
   }
- 
+
   for(const b of bots){
     b.t-=dt;
     if(b.t<=0){
@@ -246,9 +204,9 @@ function tick(now){
     eatPellets(b);
     if(b.m>80)b.m-=b.m*.01*dt;
   }
- 
+
   if(me.alive&&now-lastPush>50){push();lastPush=now}
- 
+
   const seen=new Set(),list=[];
   for(const p of peers){
     seen.add(p.id);
@@ -260,7 +218,7 @@ function tick(now){
   for(const b of bots)list.push({x:b.x,y:b.y,m:b.m,h:b.h,n:b.name});
   if(me.alive)list.push({x:me.x,y:me.y,m:me.m,h:me.h,n:me.name,me:1});
   list.sort((a,b)=>a.m-b.m);
- 
+
   const z=Math.max(.3,1.15-Math.sqrt(me.m)*.022);
   g.setTransform(dpr,0,0,dpr,0,0);
   g.fillStyle=T.grid;g.fillRect(0,0,vw,vh);
@@ -286,7 +244,7 @@ function tick(now){
     g.textAlign='center';g.textBaseline='middle';g.lineWidth=fs*.18;g.strokeStyle='rgba(0,0,0,.45)';
     g.strokeText(o.n,o.x,o.y);g.fillStyle='#fff';g.fillText(o.n,o.x,o.y);
   }
- 
+
   // minimap
   mg.clearRect(0,0,96,96);
   for(const o of list){
@@ -294,7 +252,7 @@ function tick(now){
     mg.fillStyle=o.me?'#fff':col(o.h);mg.beginPath();mg.arc(o.x/W*96,o.y/W*96,o.me?4:3,0,6.2832);mg.fill();
     if(o.me){mg.lineWidth=2;mg.strokeStyle=col(o.h);mg.stroke()}
   }
- 
+
   if(now-lastHud>300){
     lastHud=now;
     const n=peers.length+(me.alive?1:0);
@@ -311,5 +269,3 @@ requestAnimationFrame(tick);
 </script>
 </body>
 </html>
- 
-Claude finished the response

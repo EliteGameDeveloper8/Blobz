@@ -74,7 +74,9 @@ label{display:block;text-align:left;font-size:12px;color:var(--mut);margin:2px 2
 <label for="rm">Room name</label><input id="rm" maxlength="20" autocomplete="off" aria-label="Room name">
 <label class="ck"><input type="checkbox" id="pub"> Public (listed in Browse; off = private, join by name or link only)</label>
 <label class="ck"><input type="checkbox" id="pw"> Powerups (off by default)</label>
-<label for="mo">Game mode</label><select id="mo"><option value="0">Classic: endless, biggest blob wins</option><option value="1">Rush: 3-minute rounds</option><option value="2">Hill: hold the zone, first to 60 points</option><option value="3">Tag: runners score, more near the seeker; first to 100</option></select>
+<label for="mo">Game mode</label><select id="mo"><option value="0">Classic / Endless</option><option value="1">Rush: timed rounds</option><option value="2">Hill: hold the zone</option><option value="3">Tag: runners score, more near the seeker</option></select>
+<div id="oR" hidden><label for="rlen">Round length (minutes)</label><input id="rlen" type="number" inputmode="decimal" min="0" step="any" value="3"></div>
+<div id="oE" hidden><label for="end">Play until</label><select id="end"><option value="0">Goal (first to reach it)</option><option value="1">Time (most points when it ends)</option></select><label for="ev" id="evl">Goal (points)</label><input id="ev" type="number" inputmode="decimal" min="0" step="any"></div>
 <label for="mp">Map</label><select id="mp"><option value="0">Small</option><option value="1" selected>Medium</option><option value="2">Big</option><option value="3">Maze</option></select>
 <button id="go">Create room</button><button class="alt back">← Back</button></div>
 <div id="vb" hidden><div id="rl"></div><button class="alt back">← Back</button></div>
@@ -95,7 +97,7 @@ label{display:block;text-align:left;font-size:12px;color:var(--mut);margin:2px 2
 <div id="ver"></div>
 <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <script>
-let W=2200;const VERSION="1.8",$=i=>document.getElementById(i),cv=$('c'),g=cv.getContext('2d'),mg=$('mm').getContext('2d');
+let W=2200;const VERSION="1.9",$=i=>document.getElementById(i),cv=$('c'),g=cv.getContext('2d'),mg=$('mm').getContext('2d');
 let dpr=1,vw=0,vh=0;
 function rs(){dpr=Math.min(devicePixelRatio||1,2);vw=innerWidth;vh=innerHeight;cv.width=vw*dpr;cv.height=vh*dpr}
 addEventListener('resize',rs);rs();
@@ -121,7 +123,7 @@ const cleanRoom=s=>(s||'').toLowerCase().replace(/[^a-z0-9-]/g,'').slice(0,20)||
 // ---- world ----
 const pel=[];
 function setMap(i){mapI=i;W=MAPS[i].w;th();pel.length=0;H.pups.length=0;net.pups=[];for(let k=0;k<MAPS[i].p;k++){const q={x:0,y:0,h:rnd(0,360)};rp(q);pel.push(q)}for(const b of H.bots){const p=spot(R(b.m));b.x=p[0];b.y=p[1]}if(me.alive){const p=spot(R(me.m));me.x=p[0];me.y=p[1]}else{me.x=W/2;me.y=W/2}}
-const POOL=['👋','😂','😠','😮','💜','👍','👎','😭','😎','🤔','🎉','🔥','💀','🙏','😴','🤝','👀','😈','🥳','😱','❤️','💩','🤡','✌️','😅','🤣','😍','😘','🥺','😤','🤯','🤪','😇','🙃','😬','🤫','🤭','🥶','🥵','🤢','🤑','🤖','👻','👽','💪','👏','🙌','🤞','💔','💯','💥','🌈','⭐','🍀','🍕','🎮','🏆','🚀','🧠','😳','😏','🤷','🙈','🐢','🍉','🎯','💎'],MODES=['Classic','Rush','Hill','Tag'];
+const POOL=['👋','😂','😠','😮','💜','👍','👎','😭','😎','🤔','🎉','🔥','💀','🙏','😴','🤝','👀','😈','🥳','😱','❤️','💩','🤡','✌️','😅','🤣','😍','😘','🥺','😤','🤯','🤪','😇','🙃','😬','🤫','🤭','🥶','🥵','🤢','🤑','🤖','👻','👽','💪','👏','🙌','🤞','💔','💯','💥','🌈','⭐','🍀','🍕','🎮','🏆','🚀','🧠','😳','😏','🤷','🙈','🐢','🍉','🎯','💎'],MODES=['Classic/Endless','Rush','Hill','Tag'];
 const PK=['bolt','shield','mass','magnet','feast','scope','nitro','burst','radar','grow'],PI={bolt:'⚡',shield:'🛡',mass:'✚',magnet:'🧲',feast:'🍎',scope:'🔭',nitro:'🚀',burst:'💥',radar:'📡',grow:'🌱'},PC={bolt:'#f5a623',shield:'#3aa8ff',mass:'#35c76f',magnet:'#e0457b',feast:'#e8542a',scope:'#9b6bff',nitro:'#17c3b2',burst:'#ff3b30',radar:'#7a8599',grow:'#b8d62a'},PD={bolt:8,shield:8,magnet:8,feast:10,scope:12,nitro:8,radar:14,grow:8};
 const BN='Pip Moss Zed Orb Juno Kit Nova Bix Taco Wisp Rex Lumi Fizz Gus Mochi Pixel Echo Blip Sunny Cosmo Dot Rune Yuki Otto Pepper Zig Mango Flux Nimbus Tofu Jinx Ember Luna Milo Ziggy Hugo Ivy Koa Mira Nico Odin Pia Quinn Rosa Sora Tilly Uma Vex Wren Yara Zola Abe Bo Cleo Dax Elf Finn Gigi Hana Ines Jax Kai Lola Maya Ned Opal Pru Rio Sage Tess Ugo Vera Wes Xena Yago Zane Boba Churro Dumpling Egg Fudge Gizmo Hobbit Iggy Jelly Koala Lemon Nacho Olive Pickle Quokka Ramen Sushi Waffle'.split(' '),
 BA='Sneaky Fuzzy Salty Sleepy Spicy Cosmic Wobbly Tiny Mighty Lazy Jolly Grumpy Silent Crispy Dizzy Cranky Bouncy Frosty Quirky Rusty Turbo Hungry Wild Zesty Dusty Mellow Rapid Shady Peppy Misty Giddy Plucky Fluffy Chilly Moody Nifty Lucky'.split(' '),
@@ -136,8 +138,8 @@ const inWall=(x,y,r)=>{const w=MAPS[mapI].walls;if(!w)return false;for(const[a,b
 function rp(q){let n=0;do{q.x=rnd(0,W);q.y=rnd(0,W)}while(inWall(q.x,q.y,8)&&++n<30)}
 function spot(r){const os=[...net.peers,...(isHost?H.bots:net.bots)];if(me.alive)os.push(me);let x,y;for(let i=0;i<60;i++){x=rnd(150,W-150);y=rnd(150,W-150);if(inWall(x,y,r+30))continue;if(os.every(o=>Math.hypot(o.x-x,o.y-y)>R(o.m)+r+150))break}return[x,y]}
 function wallPush(o,r){const w=MAPS[mapI].walls;if(!w)return;for(const[a,b,c,d]of w){const qx=cl(o.x,a,a+c),qy=cl(o.y,b,b+d),dx=o.x-qx,dy=o.y-qy,dd=Math.hypot(dx,dy);if(dd<r){if(dd<.001){const l=o.x-a,rr=a+c-o.x,t=o.y-b,bt=b+d-o.y,m=Math.min(l,rr,t,bt);if(m===l)o.x=a-r;else if(m===rr)o.x=a+c+r;else if(m===t)o.y=b-r;else o.y=b+d+r}else{o.x=qx+dx/dd*r;o.y=qy+dy/dd*r}}}o.x=cl(o.x,0,W);o.y=cl(o.y,0,W)}
-const mkbot=(i,id,l)=>{const m=rnd(15,50),p=spot(R(m));return{id,l:l||0,x:p[0],y:p[1],m,h:rnd(0,360),pa:Math.random()<.5?0:1+(Math.random()*5|0),ph:rnd(0,360),md:0,mu:0,hn:true,ag:rnd(.35,1),pn:rnd(4000,9000),pid:null,ps:0,ig:null,jt:0,vx:0,vy:0,ux:0,uy:0,t:0,n:bname()}};
-const H={bots:[],pups:[],nid:1,tp:3,last:0,mode:0,pub:false,pw:false,tag:'',tagT:0,tagI:'',tagIT:0,rend:0,hill:[1500,1500],ht:0};   // simulated only by the room host
+const mkbot=(i,id,l)=>{const m=rnd(15,50),p=spot(R(m));return{id,l:l||0,x:p[0],y:p[1],m,h:rnd(0,360),pa:Math.random()<.5?0:1+(Math.random()*5|0),ph:rnd(0,360),md:0,mu:0,sk:0,hn:true,ag:rnd(.35,1),pn:rnd(4000,9000),pid:null,ps:0,ig:null,jt:0,vx:0,vy:0,ux:0,uy:0,t:0,n:bname()}};
+const H={bots:[],pups:[],nid:1,tp:3,last:0,mode:0,pub:false,pw:false,len:180000,goal:60,et:false,tag:'',tagT:0,tagI:'',tagIT:0,rend:0,hill:[1500,1500],ht:0};   // simulated only by the room host
 
 const fx={bolt:0,shield:0,magnet:0,feast:0,scope:0,nitro:0,radar:0,grow:0},rings=[];
 const shielded=()=>performance.now()<fx.shield;
@@ -222,7 +224,7 @@ setInterval(()=>{
   net.peers=list.map(toP);
   if(me.alive)list.push([myId,me.name,Math.round(me.x),Math.round(me.y),Math.round(me.m),me.h,me.life,shielded()?1:0,curEm(),Math.round(me.pt),me.pa,me.ph]);
   hostSim(Math.min((now-(H.last||now))/1000,.25));H.last=now;
-  const msg={t:'r',p:list,b:H.bots.map(b=>[b.id,Math.round(b.x),Math.round(b.y),Math.round(b.m),b.h|0,b.l,b.n,b.pa|0,b.ph|0]),g:[H.mode,mapI,Math.max(0,Math.round((H.rend-now)/1000)),Math.round(H.hill[0]),Math.round(H.hill[1]),H.tag],u:H.pups.map(u=>[u.id,PK.indexOf(u.k),Math.round(u.x),Math.round(u.y)])};
+  const msg={t:'r',p:list,b:H.bots.map(b=>[b.id,Math.round(b.x),Math.round(b.y),Math.round(b.m),b.h|0,b.l,b.n,b.pa|0,b.ph|0]),g:[H.mode,mapI,Math.max(0,Math.round((H.rend-now)/1000)),Math.round(H.hill[0]),Math.round(H.hill[1]),H.tag,H.goal,H.et?1:0],u:H.pups.map(u=>[u.id,PK.indexOf(u.k),Math.round(u.x),Math.round(u.y)])};
   for(const c of conns.values())if(c.open)try{c.send(msg)}catch(e){}
 },50);
 function push(){
@@ -235,14 +237,21 @@ const HR=240,LOBBY=PREFIX+'@dir',dirMap=new Map();let dirP=null,bt=0;
 const MODE=()=>isHost?H.mode:(net.mode||0),HILL=()=>isHost?H.hill:(net.hill||[0,0]);
 const REM=()=>isHost?Math.max(0,(H.rend-performance.now())/1000):Math.max(0,(net.rem||0)-(performance.now()-(net.remAt||0))/1000);
 const fmt=t=>(t/60|0)+':'+String(t%60|0).padStart(2,'0');
+const GOAL=()=>isHost?H.goal:(net.goal||60),ET=()=>isHost?H.et:!!net.et;
 const TAGID=()=>isHost?H.tag:(net.tag||'');
 function tagObj(){const id=TAGID();if(!id)return null;if(id===myId)return me.alive?me:null;if(id.startsWith('bot:')){const n=+id.slice(4);return(isHost?H.bots:net.bots).find(b=>b.id===n)||null}return net.peers.find(p=>p.id===id)||null}
-function hostCfg(){H.pub=$('pub').checked;H.pw=$('pw').checked;H.pups.length=0;H.mode=+$('mo').value;if(mapI!==+$('mp').value)setMap(+$('mp').value);H.rend=performance.now()+180000;H.hill=H.mode===2?spot(60):[W/2,W/2];H.ht=0;H.tag='';H.tagT=0;H.tagI='';H.tagIT=0}
-function applyG(g){const mp=cl(+g[1]|0,0,MAPS.length-1);if(mp!==mapI)setMap(mp);net.mode=cl(+g[0]|0,0,3);net.tag=String(g[5]||'').slice(0,60);net.rem=+g[2]||0;net.remAt=performance.now();net.hill=[+g[3]||0,+g[4]||0]}
+function hostCfg(){
+  H.pub=$('pub').checked;H.pw=$('pw').checked;H.pups.length=0;H.mode=+$('mo').value;if(mapI!==+$('mp').value)setMap(+$('mp').value);
+  const v=id=>+$(id).value,mins=x=>(x>0?cl(x,.1,240):3)*60000;
+  H.et=H.mode>=2&&$('end').value==='1';
+  H.goal=H.mode>=2&&!H.et&&v('ev')>0?cl(Math.round(v('ev')),1,100000):(H.mode===3?100:60);
+  H.len=H.mode===1?mins(v('rlen')):H.et?mins(v('ev')):180000;
+  H.rend=performance.now()+H.len;H.hill=H.mode===2?spot(60):[W/2,W/2];H.ht=0;H.tag='';H.tagT=0;H.tagI='';H.tagIT=0}
+function applyG(g){const mp=cl(+g[1]|0,0,MAPS.length-1);if(mp!==mapI)setMap(mp);net.mode=cl(+g[0]|0,0,3);net.tag=String(g[5]||'').slice(0,60);net.goal=+g[6]||60;net.et=+g[7]?1:0;net.rem=+g[2]||0;net.remAt=performance.now();net.hill=[+g[3]||0,+g[4]||0]}
 function banner(t){const b=$('bn');b.textContent=t;b.hidden=false;clearTimeout(bt);bt=setTimeout(()=>{b.hidden=true},5000)}
 function onWin(name){banner(name?name+' wins the round!':'Round over');me.pt=0;if(me.alive){const p=spot(R(20));me.x=p[0];me.y=p[1];me.m=20;me.life++}}
 function endRound(name){
-  H.rend=performance.now()+180000;H.ht=0;H.tag='';
+  H.rend=performance.now()+H.len;H.ht=0;H.tag='';
   H.bots.forEach((b,i)=>Object.assign(b,mkbot(i,b.id,b.l+1)));
   for(const c of conns.values())if(c.open)try{c.send({t:'w',n:name})}catch(e){}
   onWin(name);
@@ -322,18 +331,24 @@ function tagStep(pl){
   const sk=all.find(o=>o.id===H.tag);if(!sk||t<H.tagT)return;
   for(const o of all){if(o===sk||o.s||(o.id===H.tagI&&t<H.tagIT))continue;if(Math.hypot(o.x-sk.x,o.y-sk.y)<R(sk.m)+R(o.m)){H.tagI=sk.id;H.tagIT=t+2500;H.tag=o.id;H.tagT=t+600;break}}
 }
+const los=(a,b)=>{if(!MAPS[mapI].walls)return true;const d=Math.hypot(b.x-a.x,b.y-a.y),n=Math.ceil(d/60);for(let i=1;i<n;i++)if(inWall(a.x+(b.x-a.x)*i/n,a.y+(b.y-a.y)*i/n,10))return false;return true};
 function think(b,pl){
-  const t=performance.now();
-  if(!(t<b.mu)){const r=Math.random();
-    if(r<.12){b.md=1;b.mu=t+rnd(900,2800)}                      // stops and idles
-    else if(r<.3){b.md=2;b.mu=t+rnd(2000,5000);b.wa=rnd(0,6.28)} // wanders
-    else{b.md=0;b.mu=t+rnd(3000,8000);b.hn=Math.random()<b.ag}}  // active; hunts only if aggressive this time
+  const t=performance.now(),mp=MAPS[mapI],maze=!!mp.walls,small=mp.w<1700,big=mp.w>2800,rush=H.mode===1,hill=H.mode===2;
+  // stuck on a wall or corner: wander off for a moment
+  if(b.lx!==undefined&&b.md!==1&&Math.hypot(b.x-b.lx,b.y-b.ly)<6){if(++b.sk>=3){b.sk=0;b.md=2;b.mu=t+rnd(1500,3000);b.wa=rnd(0,6.28);b.pid=null}}else b.sk=0;
+  b.lx=b.x;b.ly=b.y;
+  if(!(t<b.mu)){const r=Math.random(),ip=rush?.05:small?.07:big?.15:.12,wp=ip+(big?.28:small?.12:.18);
+    if(r<ip){b.md=1;b.mu=t+rnd(900,2800)}                       // stops and idles (less on small maps and in Rush)
+    else if(r<wp){b.md=2;b.mu=t+rnd(2000,5000);b.wa=rnd(0,6.28)} // wanders (more on big maps)
+    else{b.md=0;b.mu=t+rnd(3000,8000);b.hn=Math.random()<cl(b.ag*(small||rush?1.3:big?.85:1),0,1)}}
   let ax=0,ay=0,tw=0,prey=null,pd=1e9,pkey='';
+  const fr=maze?180:280,pr=maze?320:big?520:450;               // shorter sight in the maze, longer on big maps
   if(H.mode!==3)for(const o of [...pl,...H.bots]){
     if(o===b)continue;
-    const dx=o.x-b.x,dy=o.y-b.y,d=Math.hypot(dx,dy)||1,rg=R(o.m)+280,key=typeof o.id==='number'?'b'+o.id:o.id;
+    const dx=o.x-b.x,dy=o.y-b.y,d=Math.hypot(dx,dy)||1,rg=R(o.m)+fr,key=typeof o.id==='number'?'b'+o.id:o.id;
+    if(d>Math.max(rg,pr)||(maze&&!los(b,o)))continue;       // no seeing through walls
     if(o.m>b.m*1.12&&d<rg){const w=1-d/rg;ax-=dx/d*w;ay-=dy/d*w;tw+=w}
-    else if(b.md===0&&b.hn&&b.m>o.m*1.25&&!o.s&&d<450&&d<pd&&!(b.ig&&b.ig.k===key&&t<b.ig.u)){prey=o;pd=d;pkey=key}
+    else if(b.md===0&&b.hn&&b.m>o.m*1.25&&!o.s&&d<pr&&d<pd&&!(b.ig&&b.ig.k===key&&t<b.ig.u)){prey=o;pd=d;pkey=key}
   }
   let ux=0,uy=0,wk=.6;
   if(H.mode===3){[ux,uy]=tagDir(b,pl);wk=H.tag==='bot:'+b.id?0:1}
@@ -341,8 +356,11 @@ function think(b,pl){
   else if(b.md===1){b.pid=null;b.ux=0;b.uy=0;return}
   else if(prey){
     if(b.pid!==pkey){b.pid=pkey;b.ps=t}
-    if(t-b.ps>b.pn){b.ig={k:pkey,u:t+rnd(7000,13000)};b.pid=null;b.md=2;b.mu=t+rnd(2000,4000);b.wa=rnd(0,6.28);ux=Math.cos(b.wa);uy=Math.sin(b.wa)} // gives up the chase
+    if(t-b.ps>b.pn*(maze?.6:small?1.2:1)){b.ig={k:pkey,u:t+rnd(7000,13000)};b.pid=null;b.md=2;b.mu=t+rnd(2000,4000);b.wa=rnd(0,6.28);ux=Math.cos(b.wa);uy=Math.sin(b.wa)} // gives up the chase
     else{ux=prey.x-b.x;uy=prey.y-b.y;wk=0}
+  }
+  else if(hill&&b.ag>.5&&b.md!==2){                            // Hill: the bolder bots contest the zone
+    const h=H.hill;if(Math.hypot(h[0]-b.x,h[1]-b.y)>HR*.6){ux=h[0]-b.x;uy=h[1]-b.y}else{b.wa=(b.wa??rnd(0,6.28))+rnd(-1,1);ux=Math.cos(b.wa);uy=Math.sin(b.wa)}
   }else{
     b.pid=null;let tg=null,td=550;
     if(b.md!==2||Math.random()<.3){
@@ -361,9 +379,9 @@ function think(b,pl){
 }
 function hostSim(dt){
   H.tp-=dt;
-  if(H.mode===1&&performance.now()>H.rend){let w=null;for(const p of[...net.peers,...(me.alive?[{n:me.name,m:me.m}]:[])])if(!w||p.m>w.m)w=p;endRound(w?w.n:'')}
+  if((H.mode===1||(H.mode>=2&&H.et))&&performance.now()>H.rend){let w=null;const key=H.mode===1?p=>p.m:p=>p.pt;for(const p of[...net.peers,...(me.alive?[{n:me.name,m:me.m,pt:me.pt}]:[])])if(!w||key(p)>key(w))w=p;endRound(w?w.n:'')}
   if(H.mode===2){H.ht-=dt;if(H.ht<=0){H.ht=25;H.hill=spot(60)}}
-  if(H.mode>=2){const gl=H.mode===3?100:60,w=net.peers.find(p=>p.pt>=gl)||(me.alive&&me.pt>=gl?{n:me.name}:null);if(w)endRound(w.n)}
+  if(H.mode>=2&&!H.et){const gl=H.goal,w=net.peers.find(p=>p.pt>=gl)||(me.alive&&me.pt>=gl?{n:me.name}:null);if(w)endRound(w.n)}
   if(H.tp<=0){H.tp=rnd(4,8);if(H.pw&&H.pups.length<8)spawnPup()}
   const pl=net.peers.map(p=>({id:p.id,x:p.x,y:p.y,m:p.m,l:p.l,s:p.s}));
   if(me.alive)pl.push({id:myId,x:me.x,y:me.y,m:me.m,l:me.life,s:shielded()?1:0});
@@ -413,11 +431,13 @@ $('mnb').onclick=askMenu;$('cfn').onclick=()=>{$('cf').hidden=true};$('cfy').onc
 addEventListener('keydown',e=>{if(e.key==='Escape'&&!e.repeat){if(!$('cf').hidden)$('cf').hidden=true;else askMenu()}});
 let wasSk=false;
 function goalUi(){
-  const m=MODE(),G=$('goal');if(m<1||!me.alive){G.hidden=true;return}G.hidden=false;let a,b;
-  if(m===1){a='⏱ '+fmt(REM());b='Biggest blob when time runs out wins'}
-  else if(m===2){a='⛰ '+Math.round(me.pt)+' / 60';b='Stay in the gold zone'}
+  const m=MODE(),G=$('goal');if(m<1||!me.alive){G.hidden=true;return}G.hidden=false;
+  const et=m>=2&&ET(),pts=Math.round(me.pt),tm='⏱ '+fmt(REM());let a,b;
+  if(m===1){a=tm;b='Biggest blob when time runs out wins'}
+  else if(m===2){a=et?tm:'⛰ '+pts+' / '+GOAL();b=et?'Most points when time ends · you '+pts:'Stay in the gold zone'}
   else{const sk=!!myId&&TAGID()===myId;
-    if(sk){a="🎯 You're it!";b='Touch a blob to pass it on'}else{const o=tagObj();a='🏃 '+Math.round(me.pt)+' / 100';b=o?'Seeker: '+(o.n||'?')+' · closer = more points':'Choosing a seeker…'}
+    if(sk){a="🎯 You're it!";b='Touch a blob to pass it on'+(et?' · '+tm:'')}
+    else{const o=tagObj();a=et?tm:'🏃 '+pts+' / '+GOAL();b=(o?'Seeker: '+(o.n||'?'):'Choosing a seeker…')+(et?' · you '+pts:'')}
     if(sk&&!wasSk)banner("🎯 You're the seeker! Tag someone to pass it on");wasSk=sk}
   $('gm').textContent=a;$('gs').textContent=b;
 }
@@ -506,7 +526,7 @@ function tick(now){
   for(const o of list){
     const r=R(o.m);
     if(o.x+r<x0||o.x-r>x1||o.y+r<y0||o.y-r>y1)continue;
-    g.fillStyle=col(o.h);g.beginPath();g.arc(o.x,o.y,r,0,6.2832);g.fill();drawPat(g,o.x,o.y,r,o.pa,o.ph);
+    g.fillStyle=col(o.h);g.beginPath();g.arc(o.x,o.y,r,0,6.2832);g.fill();drawPat(g,o.x,o.y,r,o.pa,o.ph);g.beginPath();g.arc(o.x,o.y,r,0,6.2832);
     g.lineWidth=Math.max(2,r*(o.me&&bo?.18:.08));g.strokeStyle=o.me?'#fff':'rgba(0,0,0,.25)';g.stroke();
     const sl=o.me?fx.shield-now:1e9;
     if(o.s&&(sl>2000||((now/140|0)%2))){
@@ -578,6 +598,9 @@ function buildPat(){$('pat').textContent='';PATS.forEach((n,i)=>mk(n,()=>{me.pa=
 $('hue').oninput=e=>{me.h=+e.target.value;$('h1').style.color=col(me.h);skin()};
 $('phue').value=me.ph;$('phue').oninput=e=>{me.ph=+e.target.value;skin()};
 buildPat();skin();
+function modeUi(){const m=+$('mo').value,t=$('end').value==='1';$('oR').hidden=m!==1;$('oE').hidden=m<2;$('evl').textContent=t?'Time (minutes)':'Goal (points)'}
+function evDef(){$('ev').value=$('end').value==='1'?3:(+$('mo').value===3?100:60)}
+$('mo').onchange=$('end').onchange=()=>{evDef();modeUi()};evDef();modeUi();
 buildEm();
 $('ver').textContent='v'+VERSION;
 connect(cleanRoom(location.hash.slice(1)));

@@ -15,6 +15,10 @@ canvas#c{position:fixed;inset:0;width:100%;height:100%;display:block;touch-actio
 #hud{position:fixed;top:calc(env(safe-area-inset-top,0px) + 8px);left:10px;right:10px;display:flex;justify-content:space-between;align-items:flex-start;gap:8px;pointer-events:none;font-size:13px}
 #hud>div,#mm{background:color-mix(in srgb,var(--card) 85%,transparent);border-radius:10px}
 #hud>div{padding:6px 10px;white-space:pre}
+#st{pointer-events:auto}
+#cm{position:fixed;right:10px;top:50%;transform:translateY(-50%);width:176px;padding:12px;border-radius:14px;background:var(--card);box-shadow:0 8px 28px rgba(20,20,60,.25)}
+#cm[hidden]{display:none}
+#cm button{margin:6px 0 0;padding:9px;font-size:14px}
 #mm{position:fixed;left:10px;bottom:calc(env(safe-area-inset-bottom,0px) + 10px);width:96px;height:96px;pointer-events:none}
 #bst{position:fixed;right:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 14px);width:76px;height:76px;border-radius:50%;padding:0;font-size:14px;touch-action:none;user-select:none;-webkit-user-select:none}
 #ov{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:16px;background:color-mix(in srgb,var(--bg) 70%,transparent)}
@@ -35,7 +39,7 @@ label{display:block;text-align:left;font-size:12px;color:var(--mut);margin:2px 2
 <div id="hud"><div id="st"></div><div id="lb"></div></div>
 <div id="ov"><div id="card">
 <h1 id="h1">Blobz.io</h1>
-<p id="msg">Eat pellets, swallow smaller blobs, dodge bigger ones. Drag to steer, hold Space or Boost to dash.</p>
+<p id="msg">Eat pellets, swallow smaller blobs, dodge bigger ones. Drag to steer, hold Space or Boost to dash. Grab powerups: ⚡ speed, 🛡 shield, ✚ mass.</p>
 <input id="nm" maxlength="14" placeholder="Nickname" autocomplete="off" enterkeyhint="go" aria-label="Nickname">
 <label for="hue">Blob colour</label>
 <input id="hue" type="range" min="0" max="359">
@@ -44,6 +48,13 @@ label{display:block;text-align:left;font-size:12px;color:var(--mut);margin:2px 2
 <button id="go">Play</button>
 <p id="net" style="margin:8px 0 0;font-size:13px">Connecting…</p>
 </div></div>
+<div id="cm" hidden><b>Cheats</b>
+<button data-c="god">God mode: off</button>
+<button data-c="fast">Speed ×2: off</button>
+<button data-c="wide">Wide view: off</button>
+<button data-c="mass">+100 mass</button>
+<button data-c="pup">Summon powerup</button>
+<button data-c="x">Close</button></div>
 <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <script>
 const W=3000,$=i=>document.getElementById(i),cv=$('c'),g=cv.getContext('2d'),mg=$('mm').getContext('2d');
@@ -68,9 +79,12 @@ $('rm').value=cleanRoom(location.hash.slice(1));
 
 // ---- world ----
 const pel=Array.from({length:450},()=>({x:rnd(0,W),y:rnd(0,W),h:rnd(0,360)}));
-const NAMES=['Pip','Moss','Zed','Orb','Juno','Kit'];
-const mkbot=i=>({x:rnd(0,W),y:rnd(0,W),m:rnd(15,50),h:rnd(0,360),tx:W/2,ty:W/2,t:0,name:NAMES[i]});
-const bots=NAMES.map((_,i)=>mkbot(i));
+const NAMES=['Pip','Moss','Zed','Orb','Juno','Kit'],PK=['bolt','shield','mass'],PI={bolt:'⚡',shield:'🛡',mass:'✚'},PC={bolt:'#f5a623',shield:'#3aa8ff',mass:'#35c76f'};
+const mkbot=(i,id,l)=>({id,l:l||0,x:rnd(0,W),y:rnd(0,W),m:rnd(15,50),h:rnd(0,360),vx:0,vy:0,ux:0,uy:0,t:0,n:NAMES[i]});
+const H={bots:[],pups:[],nid:1,tp:3,last:0};   // simulated only by the room host
+NAMES.forEach((_,i)=>H.bots.push(mkbot(i,i+1)));
+const fx={bolt:0,shield:0},ch={god:0,fast:0,wide:0};
+const shielded=()=>ch.god||performance.now()<fx.shield;
 let ptr=null,boost=false;
 cv.addEventListener('pointermove',e=>{ptr=[e.clientX,e.clientY]});
 cv.addEventListener('pointerdown',e=>{ptr=[e.clientX,e.clientY]});
@@ -83,11 +97,13 @@ for(const ev of['pointerup','pointercancel','lostpointercapture'])bst.addEventLi
 // ---- multiplayer: PeerJS star network, the first player in a room hosts ----
 // Needs no server of your own. If the host leaves, a remaining player takes over.
 const PREFIX='blobz-gh-k7x2-';
-const net={state:'off',room:'main',peers:[],fail:0};
+const net={state:'off',room:'main',peers:[],bots:[],pups:[],fail:0};
 let peer=null,myId=null,hostConn=null,isHost=false,gen=0;
 const conns=new Map(),roster=new Map();
-const toP=r=>({id:String(r[0]),n:String(r[1]||'Blob').slice(0,14),x:cl(+r[2]||0,0,W),y:cl(+r[3]||0,0,W),m:cl(+r[4]||20,10,6000),h:(+r[5]||0)%360,l:+r[6]||0});
-function teardown(){try{peer&&peer.destroy()}catch(e){}peer=hostConn=null;isHost=false;conns.clear();roster.clear();net.peers=[]}
+const toP=r=>({id:String(r[0]),n:String(r[1]||'Blob').slice(0,14),x:cl(+r[2]||0,0,W),y:cl(+r[3]||0,0,W),m:cl(+r[4]||20,10,6000),h:(+r[5]||0)%360,l:+r[6]||0,s:+r[7]?1:0});
+const toBot=r=>({id:+r[0]||1,n:NAMES[(+r[0]||1)-1]||'Bot',x:cl(+r[1]||0,0,W),y:cl(+r[2]||0,0,W),m:cl(+r[3]||20,10,6000),h:(+r[4]||0)%360,l:+r[5]||0});
+const toU=r=>({id:+r[0],k:PK[+r[1]]||'mass',x:cl(+r[2]||0,0,W),y:cl(+r[3]||0,0,W)});
+function teardown(){try{peer&&peer.destroy()}catch(e){}peer=hostConn=null;isHost=false;conns.clear();roster.clear();net.peers=[];net.bots=[];net.pups=[]}
 function retry(my){
   if(my!==gen)return;
   teardown();
@@ -104,9 +120,14 @@ function start(room,my){
     const drop=()=>{conns.delete(c.peer);roster.delete(c.peer)};
     conns.set(c.peer,c);
     c.on('data',d=>{
-      if(!d||d.t!=='s')return;
-      if(!d.a){roster.delete(c.peer);return}
-      roster.set(c.peer,{r:[c.peer,d.n,d.x,d.y,d.m,d.h,d.l],seen:performance.now()});
+      if(!d)return;
+      if(d.t==='e')botEaten(+d.b);
+      else if(d.t==='u')pickup(+d.id,c);
+      else if(d.t==='c')spawnPup(roster.get(c.peer)?.r);
+      else if(d.t==='s'){
+        if(!d.a){roster.delete(c.peer);return}
+        roster.set(c.peer,{r:[c.peer,d.n,d.x,d.y,d.m,d.h,d.l,d.s],seen:performance.now()});
+      }
     });
     c.on('close',drop);c.on('error',drop);
   });
@@ -122,7 +143,14 @@ function joinAs(hid,my){
     if(my!==gen)return;
     myId=id;const c=hostConn=p.connect(hid);
     c.on('open',()=>{if(my===gen){net.state='live';net.fail=0}});
-    c.on('data',d=>{if(d&&d.t==='r'&&Array.isArray(d.p))net.peers=d.p.slice(0,60).filter(r=>Array.isArray(r)&&r[0]!==myId).map(toP)});
+    c.on('data',d=>{
+      if(!d)return;
+      if(d.t==='r'&&Array.isArray(d.p)){
+        net.peers=d.p.slice(0,60).filter(r=>Array.isArray(r)&&r[0]!==myId).map(toP);
+        if(Array.isArray(d.b))net.bots=d.b.slice(0,20).map(toBot);
+        if(Array.isArray(d.u))net.pups=d.u.slice(0,20).map(toU);
+      }else if(d.t==='p')grant(d.k);
+    });
     c.on('close',()=>retry(my));
     setTimeout(()=>{if(my===gen&&!c.open)retry(my)},9000);
   });
@@ -133,15 +161,69 @@ setInterval(()=>{
   const now=performance.now(),list=[];
   for(const[k,v]of roster){if(now-v.seen>4000)roster.delete(k);else list.push(v.r)}
   net.peers=list.map(toP);
-  if(me.alive)list.push([myId,me.name,Math.round(me.x),Math.round(me.y),Math.round(me.m),me.h,me.life]);
-  const msg={t:'r',p:list};
+  if(me.alive)list.push([myId,me.name,Math.round(me.x),Math.round(me.y),Math.round(me.m),me.h,me.life,shielded()?1:0]);
+  hostSim(Math.min((now-(H.last||now))/1000,.25));H.last=now;
+  const msg={t:'r',p:list,b:H.bots.map(b=>[b.id,Math.round(b.x),Math.round(b.y),Math.round(b.m),b.h|0,b.l]),u:H.pups.map(u=>[u.id,PK.indexOf(u.k),Math.round(u.x),Math.round(u.y)])};
   for(const c of conns.values())if(c.open)try{c.send(msg)}catch(e){}
 },50);
 function push(){
   if(!hostConn||!hostConn.open)return;
-  try{hostConn.send(me.alive?{t:'s',a:1,n:me.name,x:Math.round(me.x),y:Math.round(me.y),m:Math.round(me.m),h:me.h,l:me.life}:{t:'s',a:0})}catch(e){}
+  try{hostConn.send(me.alive?{t:'s',a:1,n:me.name,x:Math.round(me.x),y:Math.round(me.y),m:Math.round(me.m),h:me.h,l:me.life,s:shielded()?1:0}:{t:'s',a:0})}catch(e){}
 }
-const vis=new Map(),ate=new Set();
+const vis=new Map(),ate=new Set(),pend=new Set();
+setInterval(()=>pend.clear(),2000);
+const send=m=>{if(hostConn&&hostConn.open)try{hostConn.send(m)}catch(e){}};
+function spawnPup(at){H.pups.push({id:H.nid++,k:PK[Math.random()*3|0],x:at?cl(+at[2]+rnd(-120,120),0,W):rnd(150,W-150),y:at?cl(+at[3]+rnd(-120,120),0,W):rnd(150,W-150)})}
+function botEaten(id){const b=H.bots.find(q=>q.id===id);if(b)Object.assign(b,mkbot(id-1,id,b.l+1))}
+function grant(k){if(k==='mass')me.m+=30;else if(k==='bolt')fx.bolt=performance.now()+8000;else fx.shield=performance.now()+8000}
+function pickup(id,c){
+  const i=H.pups.findIndex(u=>u.id===id);if(i<0)return;
+  const k=H.pups.splice(i,1)[0].k;
+  if(c){try{c.send({t:'p',k})}catch(e){}}else grant(k);
+}
+// Bot brain: flee from bigger blobs (weighted by closeness), hunt smaller ones,
+// otherwise go for pellets or powerups, wander smoothly, and steer away from walls.
+function think(b,pl){
+  let ax=0,ay=0,tw=0,prey=null,pd=1e9;
+  for(const o of [...pl,...H.bots]){
+    if(o===b)continue;
+    const dx=o.x-b.x,dy=o.y-b.y,d=Math.hypot(dx,dy)||1,rg=R(o.m)+280;
+    if(o.m>b.m*1.12&&d<rg){const w=1-d/rg;ax-=dx/d*w;ay-=dy/d*w;tw+=w}
+    else if(b.m>o.m*1.25&&!o.s&&d<450&&d<pd){prey=o;pd=d}
+  }
+  let ux=0,uy=0;
+  if(tw>0){ux=ax;uy=ay}
+  else if(prey){ux=prey.x-b.x;uy=prey.y-b.y}
+  else{
+    let tg=null,td=550;
+    for(const q of pel){const d=Math.hypot(q.x-b.x,q.y-b.y);if(d<td){td=d;tg=q}}
+    for(const q of H.pups){const d=Math.hypot(q.x-b.x,q.y-b.y)*.6;if(d<td){td=d;tg=q}}
+    if(tg){ux=tg.x-b.x;uy=tg.y-b.y}
+    else{b.wa=(b.wa??rnd(0,6.28))+rnd(-.8,.8);ux=Math.cos(b.wa);uy=Math.sin(b.wa)}
+  }
+  const n=Math.hypot(ux,uy)||1;ux/=n;uy/=n;
+  const E=220;
+  ux+=cl((E-b.x)/E,0,1)*1.5-cl((E-(W-b.x))/E,0,1)*1.5;
+  uy+=cl((E-b.y)/E,0,1)*1.5-cl((E-(W-b.y))/E,0,1)*1.5;
+  const n2=Math.hypot(ux,uy)||1;b.ux=ux/n2;b.uy=uy/n2;
+}
+function hostSim(dt){
+  H.tp-=dt;
+  if(H.tp<=0){H.tp=rnd(5,9);if(H.pups.length<6)spawnPup()}
+  const pl=net.peers.map(p=>({id:p.id,x:p.x,y:p.y,m:p.m,l:p.l,s:p.s}));
+  if(me.alive)pl.push({id:myId,x:me.x,y:me.y,m:me.m,l:me.life,s:shielded()?1:0});
+  for(const b of H.bots){
+    b.t-=dt;if(b.t<=0){b.t=.25;think(b,pl)}
+    const v=sp(b.m)*.85,k=1-Math.exp(-dt*6);
+    b.vx+=(b.ux*v-b.vx)*k;b.vy+=(b.uy*v-b.vy)*k;
+    b.x=cl(b.x+b.vx*dt,0,W);b.y=cl(b.y+b.vy*dt,0,W);
+    eatPellets(b);
+    for(let i=H.pups.length-1;i>=0;i--)if(Math.hypot(H.pups[i].x-b.x,H.pups[i].y-b.y)<R(b.m)){H.pups.splice(i,1);b.m+=15}
+    for(const c of H.bots)if(c!==b&&swallow(b,c)){b.m+=c.m*.8;Object.assign(c,mkbot(c.id-1,c.id,c.l+1))}
+    for(const p of pl)if(!p.s&&swallow(b,p)){const key='x'+b.id+':'+p.id+':'+p.l;if(!ate.has(key)){ate.add(key);b.m+=p.m*.5}}
+    if(b.m>80)b.m-=b.m*.01*dt;
+  }
+}
 
 // ---- game ----
 const swallow=(a,b)=>a.m>b.m*1.12&&Math.hypot(a.x-b.x,a.y-b.y)<R(a.m)-R(b.m)*.4;
@@ -170,40 +252,25 @@ function tick(now){
   if(me.alive){
     if(ptr){const dx=ptr[0]-vw/2,dy=ptr[1]-vh/2,d=Math.hypot(dx,dy);
       if(d>6){
-        const bo=boost&&me.m>25,v=sp(me.m)*Math.min(1,d/80)*(bo?1.7:1);
+        const bo=boost&&me.m>25,v=sp(me.m)*Math.min(1,d/80)*(bo?1.7:1)*(now<fx.bolt?1.6:1)*(ch.fast?2:1);
         me.x=cl(me.x+dx/d*v*dt,0,W);me.y=cl(me.y+dy/d*v*dt,0,W);
         if(bo)me.m-=me.m*.05*dt;
       }}
     if(me.m>40)me.m-=me.m*.004*dt;
     eatPellets(me);
-    for(const b of bots){
-      if(swallow(me,b)){me.m+=b.m*.8;Object.assign(b,mkbot(NAMES.indexOf(b.name)))}
-      else if(swallow(b,me)){die(b.name);break}
+    for(const b of isHost?H.bots:net.bots){
+      if(swallow(me,b)){const k='b'+b.id+':'+b.l;if(!ate.has(k)){ate.add(k);me.m+=b.m*.8;if(isHost)botEaten(b.id);else send({t:'e',b:b.id})}}
+      else if(!shielded()&&swallow(b,me)){die(b.n);break}
+    }
+    for(const u of isHost?H.pups:net.pups){
+      if(Math.hypot(u.x-me.x,u.y-me.y)<R(me.m)+12&&!pend.has(u.id)){pend.add(u.id);if(isHost)pickup(u.id,null);else send({t:'u',id:u.id})}
     }
   }
   if(me.alive)for(const p of peers){
-    if(swallow(me,p)){const k=p.id+':'+p.l;if(!ate.has(k)){ate.add(k);me.m+=p.m*.8}}
-    else if(swallow(p,me)){die(p.n);break}
+    if(swallow(me,p)&&!p.s){const k=p.id+':'+p.l;if(!ate.has(k)){ate.add(k);me.m+=p.m*.8}}
+    else if(!shielded()&&swallow(p,me)){die(p.n);break}
   }
 
-  for(const b of bots){
-    b.t-=dt;
-    if(b.t<=0){
-      b.t=.5;
-      const pl=me.alive?Math.hypot(me.x-b.x,me.y-b.y):1e9;
-      if(pl<350&&me.m>b.m*1.12){b.tx=2*b.x-me.x;b.ty=2*b.y-me.y}
-      else if(pl<450&&b.m>me.m*1.12){b.tx=me.x;b.ty=me.y}
-      else{
-        let best=null,bd=1e9;
-        for(const q of pel){const d=Math.hypot(q.x-b.x,q.y-b.y);if(d<bd){bd=d;best=q}}
-        if(best&&bd<600){b.tx=best.x;b.ty=best.y}else{b.tx=rnd(0,W);b.ty=rnd(0,W)}
-      }
-    }
-    const dx=b.tx-b.x,dy=b.ty-b.y,d=Math.hypot(dx,dy)||1;
-    b.x=cl(b.x+dx/d*sp(b.m)*.8*dt,0,W);b.y=cl(b.y+dy/d*sp(b.m)*.8*dt,0,W);
-    eatPellets(b);
-    if(b.m>80)b.m-=b.m*.01*dt;
-  }
 
   if(me.alive&&now-lastPush>50){push();lastPush=now}
 
@@ -212,14 +279,20 @@ function tick(now){
     seen.add(p.id);
     const v=vis.get(p.id)||{x:p.x,y:p.y};
     const k=1-Math.exp(-dt*14);v.x+=(p.x-v.x)*k;v.y+=(p.y-v.y)*k;vis.set(p.id,v);
-    list.push({x:v.x,y:v.y,m:p.m,h:p.h,n:p.n,p:1});
+    list.push({x:v.x,y:v.y,m:p.m,h:p.h,n:p.n,p:1,s:p.s});
+  }
+  for(const b of isHost?H.bots:net.bots){
+    const key='b'+b.id;seen.add(key);
+    const v=vis.get(key)||{x:b.x,y:b.y},k=1-Math.exp(-dt*14);
+    if(Math.hypot(b.x-v.x,b.y-v.y)>300){v.x=b.x;v.y=b.y}
+    v.x+=(b.x-v.x)*k;v.y+=(b.y-v.y)*k;vis.set(key,v);
+    list.push({x:v.x,y:v.y,m:b.m,h:b.h,n:b.n});
   }
   for(const id of vis.keys())if(!seen.has(id))vis.delete(id);
-  for(const b of bots)list.push({x:b.x,y:b.y,m:b.m,h:b.h,n:b.name});
-  if(me.alive)list.push({x:me.x,y:me.y,m:me.m,h:me.h,n:me.name,me:1});
+  if(me.alive)list.push({x:me.x,y:me.y,m:me.m,h:me.h,n:me.name,me:1,s:shielded()?1:0});
   list.sort((a,b)=>a.m-b.m);
 
-  const z=Math.max(.3,1.15-Math.sqrt(me.m)*.022);
+  const z=Math.max(.3,1.15-Math.sqrt(me.m)*.022)*(ch.wide?.55:1);
   g.setTransform(dpr,0,0,dpr,0,0);
   g.fillStyle=T.grid;g.fillRect(0,0,vw,vh);
   g.translate(vw/2,vh/2);g.scale(z,z);g.translate(-me.x,-me.y);
@@ -234,12 +307,18 @@ function tick(now){
     if(q.x<x0-10||q.x>x1+10||q.y<y0-10||q.y>y1+10)continue;
     g.fillStyle=col(q.h);g.beginPath();g.arc(q.x,q.y,5,0,6.2832);g.fill();
   }
+  for(const u of isHost?H.pups:net.pups){
+    if(u.x<x0-30||u.x>x1+30||u.y<y0-30||u.y>y1+30)continue;
+    g.fillStyle=PC[u.k];g.beginPath();g.arc(u.x,u.y,14+Math.sin(now/200+u.id)*2,0,6.2832);g.fill();
+    g.font='18px system-ui,sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillStyle='#fff';g.fillText(PI[u.k],u.x,u.y+1);
+  }
   const bo=boost&&me.alive&&me.m>25;
   for(const o of list){
     const r=R(o.m);
     if(o.x+r<x0||o.x-r>x1||o.y+r<y0||o.y-r>y1)continue;
     g.fillStyle=col(o.h);g.beginPath();g.arc(o.x,o.y,r,0,6.2832);g.fill();
     g.lineWidth=Math.max(2,r*(o.me&&bo?.18:.08));g.strokeStyle=o.me?'#fff':'rgba(0,0,0,.25)';g.stroke();
+    if(o.s){g.lineWidth=4;g.strokeStyle='rgba(90,190,255,.9)';g.beginPath();g.arc(o.x,o.y,r+6,0,6.2832);g.stroke()}
     const fs=Math.max(11,r*.45);g.font=`700 ${fs}px ui-rounded,system-ui,sans-serif`;
     g.textAlign='center';g.textBaseline='middle';g.lineWidth=fs*.18;g.strokeStyle='rgba(0,0,0,.45)';
     g.strokeText(o.n,o.x,o.y);g.fillStyle='#fff';g.fillText(o.n,o.x,o.y);
@@ -255,15 +334,30 @@ function tick(now){
 
   if(now-lastHud>300){
     lastHud=now;
-    const n=peers.length+(me.alive?1:0);
+    const n=peers.length+(me.alive?1:0),t=performance.now();
+    const eff=(t<fx.bolt?' ⚡'+Math.ceil((fx.bolt-t)/1000):'')+(ch.god?' 🛡∞':t<fx.shield?' 🛡'+Math.ceil((fx.shield-t)/1000):'');
     const rows=peers.map(p=>[p.n,p.m,0]);if(me.alive)rows.push([me.name,me.m,1]);
     rows.sort((a,b)=>b[1]-a[1]);
     $('lb').textContent=rows.slice(0,5).map((r,i)=>(r[2]?'▸ ':'   ')+(i+1)+'. '+r[0]+'  '+Math.round(r[1])).join('\n')||'No players yet';
-    $('st').textContent='Mass '+(me.alive?Math.round(me.m):0)+'  Best '+best+'\n'+n+' online · room '+net.room;
+    $('st').textContent='Mass '+(me.alive?Math.round(me.m):0)+'  Best '+best+eff+'\n'+n+' online · room '+net.room;
     $('net').textContent=net.state==='off'?'Offline: playing against bots.':net.state==='connecting'?'Connecting…':'Live in room “'+net.room+'”: '+n+' playing. Share this page’s link to invite friends.';
   }
   requestAnimationFrame(tick);
 }
+// Secret cheat menu: Konami code on a keyboard, or tap the title / mass readout 7 times within 3 seconds.
+const cm=$('cm');
+function cheat(c){
+  if(c==='x'){cm.hidden=true;return}
+  if(c==='mass'){if(me.alive)me.m+=100;return}
+  if(c==='pup'){if(isHost)spawnPup([0,0,me.x,me.y]);else send({t:'c'});return}
+  ch[c]=ch[c]?0:1;
+  cm.querySelector('[data-c="'+c+'"]').textContent=({god:'God mode',fast:'Speed ×2',wide:'Wide view'})[c]+': '+(ch[c]?'on':'off');
+}
+cm.addEventListener('click',e=>{const c=e.target.dataset&&e.target.dataset.c;if(c)cheat(c)});
+const KON=['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','KeyB','KeyA'];let ki=0;
+addEventListener('keydown',e=>{ki=e.code===KON[ki]?ki+1:(e.code===KON[0]?1:0);if(ki===KON.length){ki=0;cm.hidden=!cm.hidden}});
+let taps=[];
+for(const id of['h1','st'])$(id).addEventListener('pointerdown',()=>{const t=performance.now();taps=taps.filter(x=>t-x<3000);taps.push(t);if(taps.length>=7){taps=[];cm.hidden=!cm.hidden}});
 connect(cleanRoom(location.hash.slice(1)));
 requestAnimationFrame(tick);
 </script>

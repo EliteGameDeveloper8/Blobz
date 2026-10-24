@@ -1,3 +1,92 @@
+Claude
+Can you make an .io multiplayer online game?
+
+Read 2 files, ran a command, and 2 more tools
+Building a multiplayer .io game for you; the page is written, and I’m publishing it now.
+
+Blobz.io
+Artifact
+·Only you
+Yes. I built Blobz.io, an agar.io-style game: drag to steer, eat pellets, swallow smaller blobs, and avoid bigger ones.
+
+Everyone who opens the link at the same time shares one arena in real time. Only signed-in people can join the live room, so public-link visitors play against the bots instead. The bots only exist on your own screen. I haven’t playtested it with several people at once.
+
+I assumed the agar.io style. I can switch it to snake.io, add a team mode, or change the look if you’d prefer something else.
+
+adapt it for github it is hosted on github make mutiplayer work and after that add some few more features
+
+Created a file, ran a command, shared files
+I rebuilt it as a single index.html for GitHub Pages. The syntax checks out, but I couldn’t test the multiplayer here because I have no network access, so please try it with two browser tabs first.
+
+Multiplayer no longer depends on Claude. It now uses PeerJS (loaded from a CDN, no server of your own). The first player in a room becomes the host and relays everyone’s positions, and if the host leaves, another player takes over. If the PeerJS connection fails repeatedly, the game falls back to bots only.
+
+To deploy, commit index.html to a repo, then go to Settings → Pages and deploy from your main branch. Open the page in two tabs or on two devices and both should see each other.
+
+I added four features:
+
+Boost: hold Space or tap the Boost button to dash, at the cost of some mass.
+Minimap: shows the arena and where the other players are.
+Rooms: enter a room code on the start screen, and the page URL becomes …/#roomname, so you can send that link to friends for a private game.
+Colour and best score: pick your blob colour; your nickname, colour and best score are saved in the browser.
+Players on strict corporate or mobile networks may fail to connect, because there’s no relay server for those cases. If that happens, the fix is a small WebSocket server (for example on Render), which I can write if you want it.
+
+Index
+Code
+·HTML
+make the bots server side add a secret cheat menu by doing something that you cant do by acident, fix bot ai and add random powerups server side too
+
+Ran 2 commands, shared files
+I’ve updated index.html. I checked the syntax and ran the bot simulation headlessly for about 200 seconds with no errors, but I haven’t tried it with two real browsers. Please test the multiplayer with two tabs.
+
+“Server side” here means the host player’s browser, because GitHub Pages can’t run server code. The first player in a room runs the bots and powerups and sends them to everyone else. Everyone sees the same bots and pickups, and if the host leaves, another player takes over with fresh bots. The host’s tab should stay in the foreground, because browsers slow background tabs down. A real Node server on something like Render would fix that if you want one.
+
+Cheat menu: type the Konami code on a keyboard (↑ ↑ ↓ ↓ ← → ← → B A), or tap the title or the Mass readout 7 times within 3 seconds. It has God mode, Speed ×2, Wide view, +100 mass, and Summon powerup. The cheats run on your own browser, so the other players in the room are affected by them.
+
+Bot AI: the old bots only ever reacted to you, and they could get pinned against the walls. The new ones do the following:
+
+They flee from any bigger blob, harder the closer it is.
+They hunt smaller players and other bots, so they now eat each other.
+They go for pellets and powerups, wander smoothly when nothing is nearby, and steer away from walls.
+Powerups: one spawns every 5 to 9 seconds, with at most 6 on the map, and bots grab them too. ⚡ gives 8 seconds of speed, 🛡 gives 8 seconds of shield (nobody can eat you, and others see a blue ring), and ✚ gives +30 mass.
+
+Index
+Code
+·HTML
+add emotes and remove feature which slowly makes you smaller while big
+
+Ran 2 commands, shared files
+I’ve updated index.html with emotes, and big players no longer shrink slowly. The syntax check and bot simulation still pass, but I haven’t tried it in a real browser, so please check two tabs against each other.
+
+Emotes: press keys 1 to 5, or tap the 😀 button at the bottom centre and pick one. The emote floats above your blob for 2.5 seconds, and everyone in the room sees it. You can send one about once a second. The five are 👋 😂 😠 😮 💜, and I can swap them for others if you like.
+
+Shrinking: your mass now only drops when you boost. I left the bots’ own slow shrink in place so they don’t grow huge and end up eating everyone.
+
+Index
+Code
+·HTML
+show verison number in corner of current verision, fix cheat code to be doable on keyboard and a bit easier
+
+Ran 2 commands, shared files
+I’ve updated index.html to v1.4. The version number now shows in the bottom-right corner, including on the start screen. I tested the key logic by simulating key presses, but I haven’t tried it in a real browser.
+
+I couldn’t find one definite bug in the old keyboard code, but two things made it fragile. Holding a key slightly too long restarted the sequence, and it matched the physical key position, so it could fail on non-QWERTY keyboards. It now ignores held-key repeats, matches the letter you actually press, and forgives mistakes in the middle of a sequence.
+
+You can now open the cheat menu any of these ways:
+
+Type cheat while playing. It’s ignored in the nickname and room boxes, so a player named “cheat” won’t trigger it.
+Press ↑ ↑ ↓ ↓ ← → B A, a shortened Konami code.
+Press the full Konami code (↑ ↑ ↓ ↓ ← → ← → B A).
+Tap the title or the Mass readout 7 times within 3 seconds, which still works on phones.
+Index
+Code
+·HTML
+
+
+
+Claude is AI and can make mistakes. Please double-check responses.
+
+
+Index · HTML
 <!doctype html>
 <html lang="en">
 <head>
@@ -22,6 +111,7 @@ canvas#c{position:fixed;inset:0;width:100%;height:100%;display:block;touch-actio
 #emr[hidden]{display:none}
 #cm{position:fixed;right:10px;top:50%;transform:translateY(-50%);width:176px;padding:12px;border-radius:14px;background:var(--card);box-shadow:0 8px 28px rgba(20,20,60,.25)}
 #cm[hidden]{display:none}
+#ver{position:fixed;right:8px;bottom:calc(env(safe-area-inset-bottom,0px) + 2px);font-size:11px;color:var(--mut);opacity:.8;pointer-events:none}
 #cm button{margin:6px 0 0;padding:9px;font-size:14px}
 #mm{position:fixed;left:10px;bottom:calc(env(safe-area-inset-bottom,0px) + 10px);width:96px;height:96px;pointer-events:none}
 #bst{position:fixed;right:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 14px);width:76px;height:76px;border-radius:50%;padding:0;font-size:14px;touch-action:none;user-select:none;-webkit-user-select:none}
@@ -60,9 +150,10 @@ label{display:block;text-align:left;font-size:12px;color:var(--mut);margin:2px 2
 <button data-c="mass">+100 mass</button>
 <button data-c="pup">Summon powerup</button>
 <button data-c="x">Close</button></div>
+<div id="ver"></div>
 <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <script>
-const W=3000,$=i=>document.getElementById(i),cv=$('c'),g=cv.getContext('2d'),mg=$('mm').getContext('2d');
+const VERSION="1.4",W=3000,$=i=>document.getElementById(i),cv=$('c'),g=cv.getContext('2d'),mg=$('mm').getContext('2d');
 let dpr=1,vw=0,vh=0;
 function rs(){dpr=Math.min(devicePixelRatio||1,2);vw=innerWidth;vh=innerHeight;cv.width=vw*dpr;cv.height=vh*dpr}
 addEventListener('resize',rs);rs();
@@ -71,7 +162,7 @@ const col=h=>`hsl(${h} 70% 56%)`;
 const T={bg:'#eee',grid:'#ddd',wall:'#e5484d'};
 function th(){const s=getComputedStyle(document.documentElement);T.bg=s.getPropertyValue('--bg').trim();T.grid=s.getPropertyValue('--grid').trim();T.wall=s.getPropertyValue('--wall').trim()}
 th();matchMedia('(prefers-color-scheme:dark)').addEventListener('change',th);
-
+ 
 // ---- saved settings ----
 let sv={};try{sv=JSON.parse(localStorage.getItem('blobz')||'{}')}catch(e){}
 let best=+sv.b||0;
@@ -81,7 +172,7 @@ $('nm').value=sv.n||'';$('hue').value=me.h;$('h1').style.color=col(me.h);
 $('hue').oninput=e=>{me.h=+e.target.value;$('h1').style.color=col(me.h)};
 const cleanRoom=s=>(s||'').toLowerCase().replace(/[^a-z0-9-]/g,'').slice(0,20)||'main';
 $('rm').value=cleanRoom(location.hash.slice(1));
-
+ 
 // ---- world ----
 const pel=Array.from({length:450},()=>({x:rnd(0,W),y:rnd(0,W),h:rnd(0,360)}));
 const EM=['👋','😂','😠','😮','💜'],NAMES=['Pip','Moss','Zed','Orb','Juno','Kit'],PK=['bolt','shield','mass'],PI={bolt:'⚡',shield:'🛡',mass:'✚'},PC={bolt:'#f5a623',shield:'#3aa8ff',mass:'#35c76f'};
@@ -98,7 +189,7 @@ addEventListener('keyup',e=>{if(e.code==='Space')boost=false});
 const bst=$('bst');
 bst.addEventListener('pointerdown',e=>{boost=true;bst.setPointerCapture(e.pointerId);e.preventDefault()});
 for(const ev of['pointerup','pointercancel','lostpointercapture'])bst.addEventListener(ev,()=>{boost=false});
-
+ 
 // ---- multiplayer: PeerJS star network, the first player in a room hosts ----
 // Needs no server of your own. If the host leaves, a remaining player takes over.
 const PREFIX='blobz-gh-k7x2-';
@@ -229,7 +320,7 @@ function hostSim(dt){
     if(b.m>80)b.m-=b.m*.01*dt;
   }
 }
-
+ 
 // ---- game ----
 const swallow=(a,b)=>a.m>b.m*1.12&&Math.hypot(a.x-b.x,a.y-b.y)<R(a.m)-R(b.m)*.4;
 function eatPellets(o){for(const q of pel)if(Math.hypot(q.x-o.x,q.y-o.y)<R(o.m)){o.m+=1;q.x=rnd(0,W);q.y=rnd(0,W)}}
@@ -248,12 +339,12 @@ $('go').onclick=()=>{
   save();spawn();$('ov').style.display='none';push();
 };
 $('nm').addEventListener('keydown',e=>{if(e.key==='Enter')$('go').click()});
-
+ 
 let last=performance.now(),lastPush=0,lastHud=0;
 function tick(now){
   const dt=Math.min((now-last)/1000,.05);last=now;
   const peers=net.peers;
-
+ 
   if(me.alive){
     if(ptr){const dx=ptr[0]-vw/2,dy=ptr[1]-vh/2,d=Math.hypot(dx,dy);
       if(d>6){
@@ -274,10 +365,10 @@ function tick(now){
     if(swallow(me,p)&&!p.s){const k=p.id+':'+p.l;if(!ate.has(k)){ate.add(k);me.m+=p.m*.8}}
     else if(!shielded()&&swallow(p,me)){die(p.n);break}
   }
-
-
+ 
+ 
   if(me.alive&&now-lastPush>50){push();lastPush=now}
-
+ 
   const seen=new Set(),list=[];
   for(const p of peers){
     seen.add(p.id);
@@ -295,7 +386,7 @@ function tick(now){
   for(const id of vis.keys())if(!seen.has(id))vis.delete(id);
   if(me.alive)list.push({x:me.x,y:me.y,m:me.m,h:me.h,n:me.name,me:1,s:shielded()?1:0,e:curEm()});
   list.sort((a,b)=>a.m-b.m);
-
+ 
   const z=Math.max(.3,1.15-Math.sqrt(me.m)*.022)*(ch.wide?.55:1);
   g.setTransform(dpr,0,0,dpr,0,0);
   g.fillStyle=T.grid;g.fillRect(0,0,vw,vh);
@@ -328,7 +419,7 @@ function tick(now){
     g.strokeText(o.n,o.x,o.y);g.fillStyle='#fff';g.fillText(o.n,o.x,o.y);
     if(o.e){const es=Math.max(26,r*.8);g.font=es+'px system-ui,sans-serif';g.fillText(EM[o.e-1],o.x,o.y-r-es*.7+Math.sin(now/150)*3)}
   }
-
+ 
   // minimap
   mg.clearRect(0,0,96,96);
   for(const o of list){
@@ -336,7 +427,7 @@ function tick(now){
     mg.fillStyle=o.me?'#fff':col(o.h);mg.beginPath();mg.arc(o.x/W*96,o.y/W*96,o.me?4:3,0,6.2832);mg.fill();
     if(o.me){mg.lineWidth=2;mg.strokeStyle=col(o.h);mg.stroke()}
   }
-
+ 
   if(now-lastHud>300){
     lastHud=now;
     const n=peers.length+(me.alive?1:0),t=performance.now();
@@ -356,7 +447,8 @@ function emote(k){const t=performance.now();if(!me.alive||t-emLast<1200)return;e
 $('emt').onclick=()=>{$('emr').hidden=!$('emr').hidden};
 EM.forEach((e,i)=>{const b=document.createElement('button');b.textContent=e;b.setAttribute('aria-label','Emote '+(i+1));b.onclick=()=>emote(i+1);$('emr').appendChild(b)});
 addEventListener('keydown',e=>{if(e.target.tagName==='INPUT')return;const n=+e.key;if(n>=1&&n<=EM.length)emote(n)});
-// Secret cheat menu: Konami code on a keyboard, or tap the title / mass readout 7 times within 3 seconds.
+$('ver').textContent='v'+VERSION;
+// Secret cheat menu: type cheat, or the Konami code, or tap the title / mass readout 7 times in 3 seconds.
 const cm=$('cm');
 function cheat(c){
   if(c==='x'){cm.hidden=true;return}
@@ -366,8 +458,13 @@ function cheat(c){
   cm.querySelector('[data-c="'+c+'"]').textContent=({god:'God mode',fast:'Speed ×2',wide:'Wide view'})[c]+': '+(ch[c]?'on':'off');
 }
 cm.addEventListener('click',e=>{const c=e.target.dataset&&e.target.dataset.c;if(c)cheat(c)});
-const KON=['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','KeyB','KeyA'];let ki=0;
-addEventListener('keydown',e=>{ki=e.code===KON[ki]?ki+1:(e.code===KON[0]?1:0);if(ki===KON.length){ki=0;cm.hidden=!cm.hidden}});
+let kb=[];
+addEventListener('keydown',e=>{
+  if(e.repeat||e.ctrlKey||e.metaKey||e.altKey)return;
+  kb.push(e.key.length===1?e.key.toLowerCase():e.key);if(kb.length>10)kb.shift();
+  const s=kb.join(','),typing=e.target.type==='text';
+  if((!typing&&s.endsWith('c,h,e,a,t'))||s.endsWith('ArrowUp,ArrowUp,ArrowDown,ArrowDown,ArrowLeft,ArrowRight,b,a')||s.endsWith('ArrowLeft,ArrowRight,ArrowLeft,ArrowRight,b,a')){kb=[];cm.hidden=!cm.hidden}
+});
 let taps=[];
 for(const id of['h1','st'])$(id).addEventListener('pointerdown',()=>{const t=performance.now();taps=taps.filter(x=>t-x<3000);taps.push(t);if(taps.length>=7){taps=[];cm.hidden=!cm.hidden}});
 connect(cleanRoom(location.hash.slice(1)));
@@ -375,3 +472,5 @@ requestAnimationFrame(tick);
 </script>
 </body>
 </html>
+ 
+Claude finished the response

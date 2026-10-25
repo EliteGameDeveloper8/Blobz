@@ -104,7 +104,7 @@ html,body{overscroll-behavior:none;-webkit-tap-highlight-color:transparent;-webk
 <div id="ver"></div>
 <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <script>
-let W=2200;const VERSION="2.9",$=i=>document.getElementById(i),cv=$('c'),g=cv.getContext('2d'),mg=$('mm').getContext('2d');
+let W=2200;const VERSION="2.10",$=i=>document.getElementById(i),cv=$('c'),g=cv.getContext('2d'),mg=$('mm').getContext('2d');
 let dpr=1,vw=0,vh=0;
 function rs(){dpr=Math.min(devicePixelRatio||1,2);vw=innerWidth;vh=innerHeight;cv.width=vw*dpr;cv.height=vh*dpr}
 addEventListener('resize',rs);rs();
@@ -578,7 +578,7 @@ function agarStep(dt,now){
       else if(!shielded()&&swallow(q,c))return lose(c,p.n)}}}}
 // ---- game ----
 const swallow=(a,b)=>PM()!==1&&a.m>b.m*1.12&&Math.hypot(a.x-b.x,a.y-b.y)<R(a.m)-R(b.m)*.4;
-let BKy='',BL=[];
+var BKy='',BL=[];
 function bushes(){const k=String(net.room)+'|'+CUR.w+'|'+CUR.seed;if(BKy!==k){BKy=k;let h=2166136261;for(let i=0;i<k.length;i++)h=Math.imul(h^k.charCodeAt(i),16777619);const r=()=>(h=Math.imul(h,1664525)+1013904223>>>0)/4294967296;BL=[];const n=Math.round(CUR.w/420);
   for(let i=0;i<n*6&&BL.length<n;i++){const rad=50+r()*50,x=150+r()*(CUR.w-300),y=150+r()*(CUR.w-300);if(!inWall(x,y,rad+30)&&BL.every(b=>Math.hypot(b.x-x,b.y-y)>b.r+rad+250))BL.push({x,y,r:rad})}}return BL}
 function bushHit(c){if(PM()===1)return false;const rr=R(c.m);for(const b of bushes())if(rr>b.r*.9&&Math.hypot(c.x-b.x,c.y-b.y)<rr*.5+b.r*.8)return true;return false}

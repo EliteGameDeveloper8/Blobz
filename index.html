@@ -86,14 +86,14 @@ html,body{overscroll-behavior:none;-webkit-tap-highlight-color:transparent;-webk
 <input id="nm" maxlength="14" placeholder="Nickname" autocomplete="off" enterkeyhint="go" aria-label="Nickname">
 <button id="bsk" class="alt">🎨 Customize blob</button>
 <div id="v0"><button id="bof">⭐ Official servers</button><button id="bh" class="alt">Host room</button><button id="br" class="alt">Browse rooms</button><button id="brn" class="alt">Join random</button><button id="bj" class="alt">Join by name</button><button id="bs" class="alt">⚙ Settings</button></div>
-<div id="vh" hidden><label for="ps">Preset</label><select id="ps"><option value="">Pick a preset to fill the settings…</option><option value="normal">Normal</option><option value="snake">Snake (huge map, many bots)</option><option value="splitter">Splitter (like Agar.io: split, killer bushes)</option><option value="royale">Combined (everyone picks a type on join)</option><option value="maze">Maze rush</option><option value="rnd">🎲 Random everything</option></select>
+<div id="vh" hidden><label for="ps">Preset</label><select id="ps"><option value="">Pick a preset to fill the settings…</option><option value="normal">Normal</option><option value="snake">Snake (huge map, many bots)</option><option value="splitter">Splitter (like Agar.io: split, killer bushes)</option><option value="royale">Combined (everyone picks a type on join)</option><option value="duo">Combined without snake (Blob or Splitter)</option><option value="maze">Maze rush</option><option value="rnd">🎲 Random everything</option></select>
 <label for="rm">Room name</label><input id="rm" maxlength="20" autocomplete="off" aria-label="Room name">
 <label class="ck"><input type="checkbox" id="pub" checked> Public (listed in Browse; off = private, join by name or link only)</label>
 <label class="ck"><input type="checkbox" id="pw"> Powerups (off by default)</label><div id="oP" hidden><label for="pfq">Powerup frequency: <span id="pfv">5</span>/10</label><input id="pfq" type="range" min="1" max="10" value="5"><label>Enabled powerups</label><div id="pks"></div></div>
 <label for="mo">Game mode</label><select id="mo"><option value="0">Classic / Endless</option><option value="1">Rush: timed rounds</option><option value="2">Hill: hold the zone</option><option value="3">Tag: runners score, more near the seeker</option></select>
 <div id="oR" hidden><label for="rlen">Round length (minutes)</label><input id="rlen" type="number" inputmode="decimal" min="0" step="any" value="3"></div>
 <div id="oE" hidden><label for="end">Play until</label><select id="end"><option value="0">Goal (first to reach it)</option><option value="1">Time (most points when it ends)</option></select><label for="ev" id="evl">Goal (points)</label><input id="ev" type="number" inputmode="decimal" min="0" step="any"></div>
-<div id="oT" hidden><label for="tgm">Seekers</label><select id="tgm"><option value="0">Only one</option><option value="1">Percent of players</option></select><div id="tgx" hidden><label for="tgp">Seekers: <span id="tgv">20</span>% of players</label><input id="tgp" type="range" min="5" max="80" value="20"></div></div><label class="ck"><input type="checkbox" id="dg"> Deadly edges and walls</label><label class="ck"><input type="checkbox" id="wr"> Run off the map: wrap around the edges (then only maze walls can be deadly)</label><label class="ck"><input type="checkbox" id="bu"> Bushes: green killer bushes (kill any blob bigger than them that pushes into them; always on in Splitter)</label><label class="ck"><input type="checkbox" id="tmo"> Teams (coloured outlines; teammates can’t eat each other)</label><div id="oTm" hidden><label for="tmn">Number of teams: <span id="tmv">2</span></label><input id="tmn" type="range" min="2" max="6" value="2"></div><label for="pm">Player mode</label><select id="pm"><option value="0">Normal blob</option><option value="1">Snake: grow a tail</option><option value="2">Splitter: like Agar.io (split, killer bushes)</option><option value="3">Combined: everyone picks Blob, Snake or Splitter</option></select><label class="ck"><input type="checkbox" id="bon" checked> Bots</label><div id="oB"><label for="bct">Number of bots: <span id="bcv">6</span></label><input id="bct" type="range" min="1" max="30" value="6"></div><label for="sz">Map size</label><select id="sz"><option value="0">Small</option><option value="1" selected>Medium</option><option value="2">Big</option><option value="3">Huge</option></select><label for="mt">Map type</label><select id="mt"><option value="0">Open</option><option value="1">Maze</option></select><div id="oS" hidden><label for="sd">Maze seed (empty = random)</label><input id="sd" maxlength="20" autocomplete="off" placeholder="random"></div>
+<div id="oT" hidden><label for="tgm">Seekers</label><select id="tgm"><option value="0">Only one</option><option value="1">Percent of players</option></select><div id="tgx" hidden><label for="tgp">Seekers: <span id="tgv">20</span>% of players</label><input id="tgp" type="range" min="5" max="80" value="20"></div></div><label class="ck"><input type="checkbox" id="dg"> Deadly edges and walls</label><label class="ck"><input type="checkbox" id="wr"> Run off the map: wrap around the edges (then only maze walls can be deadly)</label><label class="ck"><input type="checkbox" id="bu"> Bushes: green killer bushes (kill any blob bigger than them that pushes into them; always on in Splitter)</label><label class="ck"><input type="checkbox" id="tmo"> Teams (coloured outlines; teammates can’t eat each other)</label><div id="oTm" hidden><label for="tmn">Number of teams: <span id="tmv">2</span></label><input id="tmn" type="range" min="2" max="6" value="2"></div><label for="pm">Player mode</label><select id="pm"><option value="0">Normal blob</option><option value="1">Snake: grow a tail</option><option value="2">Splitter: like Agar.io (split, killer bushes)</option><option value="3">Combined: everyone picks Blob, Snake or Splitter</option><option value="4">Combined without snake: everyone picks Blob or Splitter</option></select><label class="ck"><input type="checkbox" id="bon" checked> Bots</label><div id="oB"><label for="bct">Number of bots: <span id="bcv">6</span></label><input id="bct" type="range" min="1" max="30" value="6"></div><label for="sz">Map size</label><select id="sz"><option value="0">Small</option><option value="1" selected>Medium</option><option value="2">Big</option><option value="3">Huge</option></select><label for="mt">Map type</label><select id="mt"><option value="0">Open</option><option value="1">Maze</option></select><div id="oS" hidden><label for="sd">Maze seed (empty = random)</label><input id="sd" maxlength="20" autocomplete="off" placeholder="random"></div>
 <button id="go">Create room</button><button class="alt back">← Back</button></div>
 <div id="vb" hidden><div id="rl"></div><button class="alt back">← Back</button></div>
 <div id="vo" hidden><div id="ol"></div><button class="alt back">← Back</button></div>
@@ -111,13 +111,13 @@ html,body{overscroll-behavior:none;-webkit-tap-highlight-color:transparent;-webk
 <div id="goal" hidden><b id="gm"></b><small id="gs"></small></div>
 <div id="pi" hidden></div>
 <div id="dc" hidden role="dialog" aria-modal="true"><div><h2>You were swallowed</h2><p id="dm"></p><button id="dr">Respawn</button><button id="db" style="background:var(--bg);color:var(--fg);border:1px solid var(--grid)">Back to menu</button></div></div>
-<div id="tc" hidden role="dialog" aria-modal="true"><div><h2>Choose your type</h2><p>Combined mode: Blob, Snake and Splitter all fight in the same room.</p><button data-t="0">⚪ Blob: eat smaller blobs</button><button data-t="1">🐍 Snake: constant speed, grow a tail</button><button data-t="2">🟣 Splitter: split into cells</button><button class="alt" id="tcb">← Back to menu</button></div></div>
+<div id="tc" hidden role="dialog" aria-modal="true"><div><h2>Choose your type</h2><p id="tcp">Combined mode: Blob, Snake and Splitter all fight in the same room.</p><button data-t="0">⚪ Blob: eat smaller blobs</button><button id="tcs" data-t="1">🐍 Snake: constant speed, grow a tail</button><button data-t="2">🟣 Splitter: split into cells</button><button class="alt" id="tcb">← Back to menu</button></div></div>
 <button id="mnb" hidden title="Back to menu (Esc)">☰ Menu</button><button id="inf" hidden aria-label="Room info">ⓘ</button><div id="ip" hidden></div>
 <div id="cf" hidden role="dialog" aria-modal="true" aria-labelledby="cft"><div><h2 id="cft">Back to menu?</h2><p id="cfp"></p><button id="cfn">Keep playing</button><button id="cfy">Leave and lose progress</button></div></div>
 <div id="ver"></div>
 <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <script>
-let W=2200;const VERSION="3.5",$=i=>document.getElementById(i),cv=$('c'),g=cv.getContext('2d'),mg=$('mm').getContext('2d');
+let W=2200;const VERSION="3.7",$=i=>document.getElementById(i),cv=$('c'),g=cv.getContext('2d'),mg=$('mm').getContext('2d');
 let dpr=1,vw=0,vh=0;
 function rs(){dpr=Math.min(devicePixelRatio||1,2);vw=innerWidth;vh=innerHeight;cv.width=vw*dpr;cv.height=vh*dpr}
 addEventListener('resize',rs);rs();
@@ -192,7 +192,7 @@ function spot(r,ex){const os=[...net.peers,...(isHost?H.bots:net.bots)].filter(o
   return[bx,by,bs>0]}
 function openAng(x,y){let ba=rnd(0,6.28),bs=-1;const wr=isHost?H.wrap:net.wrap;for(let i=0;i<12;i++){const a=rnd(0,6.28);let c=0;for(const d of[90,200,340]){const qx=x+Math.cos(a)*d,qy=y+Math.sin(a)*d;if(inWall(qx,qy,30)||(!wr&&(qx<40||qy<40||qx>W-40||qy>W-40))||(trl.size&&hitTail(qx,qy,20,'-')))break;c++}if(c>bs){bs=c;ba=a}}return ba}
 function wallPush(o,r){const w=CUR.walls;if(!w)return;for(const[a,b,c,d]of w){const qx=cl(o.x,a,a+c),qy=cl(o.y,b,b+d),dx=o.x-qx,dy=o.y-qy,dd=Math.hypot(dx,dy);if(dd<r){if(dd<.001){const l=o.x-a,rr=a+c-o.x,t=o.y-b,bt=b+d-o.y,m=Math.min(l,rr,t,bt);if(m===l)o.x=a-r;else if(m===rr)o.x=a+c+r;else if(m===t)o.y=b-r;else o.y=b+d+r}else{o.x=qx+dx/dd*r;o.y=qy+dy/dd*r}}}o.x=wrp(o.x);o.y=wrp(o.y)}
-const mkbot=(i,id,l)=>{const m=rnd(15,50),p=spot(R(m),H.bots.find(q=>q.id===id)),rq=Math.random();return{id,l:l||0,x:p[2]?p[0]:-9999,y:p[2]?p[1]:-9999,w:p[2]?0:performance.now()+900,m,ang:openAng(p[0],p[1]),iq:rq<.25?rnd(.05,.3):rq<.7?rnd(.35,.65):rnd(.72,1),gr:rnd(.5,1.5),bo:0,da:0,ey:Math.random()*14|0,ty:Math.random()*3|0,px:void 0,py:void 0,h:rnd(0,360),pa:Math.random()<.5?0:1+(Math.random()*NP|0),ph:rnd(0,360),pv:(rnd(0,100)|0)+101*(rnd(0,50)|0)+10201*(rnd(0,100)|0),md:0,mu:0,sk:0,hn:true,ag:rnd(.35,1),pn:rnd(4000,9000),pid:null,ps:0,ig:null,jt:0,vx:0,vy:0,ux:0,uy:0,t:0,n:bname()}};
+const mkbot=(i,id,l)=>{const m=rnd(15,50),p=spot(R(m),H.bots.find(q=>q.id===id)),rq=Math.random();return{id,l:l||0,x:p[2]?p[0]:-9999,y:p[2]?p[1]:-9999,w:p[2]?0:performance.now()+900,m,ang:openAng(p[0],p[1]),iq:rq<.25?rnd(.05,.3):rq<.7?rnd(.35,.65):rnd(.72,1),gr:rnd(.5,1.5),bo:0,da:0,ey:Math.random()*14|0,ty:PM()===4?(Math.random()<.5?0:2):Math.random()*3|0,px:void 0,py:void 0,h:rnd(0,360),pa:Math.random()<.5?0:1+(Math.random()*NP|0),ph:rnd(0,360),pv:(rnd(0,100)|0)+101*(rnd(0,50)|0)+10201*(rnd(0,100)|0),md:0,mu:0,sk:0,hn:true,ag:rnd(.35,1),pn:rnd(4000,9000),pid:null,ps:0,ig:null,jt:0,vx:0,vy:0,ux:0,uy:0,t:0,n:bname()}};
 const H={bots:[],pups:[],nid:1,tp:3,last:0,mode:0,pub:false,pw:false,pf:5,pks:PK,pm:0,len:180000,goal:60,et:false,tags:[],hold:new Map(),imm:new Map(),tgp:0,dg:false,wrap:false,drops:[],rend:0,hill:[1500,1500],ht:0,pp:new Map(),pch:[]};   // simulated only by the room host
 
 const fx={bolt:0,shield:0,magnet:0,feast:0,scope:0,nitro:0,radar:0,grow:0,leaf:0,revive:0,vacuum:0,armor:0},rings=[];
@@ -215,7 +215,7 @@ const PREFIX='blobz-gh-k7x2-';
 const net={state:'off',room:'main',peers:[],bots:[],pups:[],drops:[],fail:0};
 let peer=null,myId=null,hostConn=null,isHost=false,gen=0;
 const conns=new Map(),roster=new Map();
-const PM=()=>isHost?H.pm:(net.pm||0),MY=()=>PM()===3?me.ty:PM(),NE=()=>MODE()!==3&&MY()!==2,trl=new Map();
+const PM=()=>isHost?H.pm:(net.pm||0),MY=()=>PM()>=3?(PM()===4&&me.ty===1?0:me.ty):PM(),NE=()=>MODE()!==3&&MY()!==2,trl=new Map();
 for(let i=0;i<6;i++)H.bots.push(mkbot(i,i+1));setMap(1,0,0);
 const toP=r=>({id:String(r[0]),n:String(r[1]||'Blob').slice(0,14),x:cl(+r[2]||0,0,W),y:cl(+r[3]||0,0,W),m:cl(+r[4]||20,10,6000),h:(+r[5]||0)%360,l:+r[6]||0,s:+r[7]?1:0,e:cl(+r[8]|0,0,POOL.length),pt:+r[9]||0,pa:cl(+r[10]|0,0,NP),ph:(+r[11]||0)%360,pv:cl(+r[12]|0,0,1030300),ey:cl(+r[14]|0,0,13),tm:TN()?hs(String(r[0]))%TN():-1,ty:cl(+r[15]|0,0,2),cs:Array.isArray(r[13])?r[13].slice(0,15).map(a=>({ty:2,x:cl(+a[0]||0,0,W),y:cl(+a[1]||0,0,W),m:cl(+a[2]||10,5,6000)})):[]});
 const toBot=r=>({id:+r[0]||1,n:String(r[6]||'Bot').slice(0,14),x:cl(+r[1]||0,0,W),y:cl(+r[2]||0,0,W),m:cl(+r[3]||20,10,6000),h:(+r[4]||0)%360,l:+r[5]||0,pa:cl(+r[7]|0,0,NP),ph:(+r[8]||0)%360,pv:cl(+r[9]|0,0,1030300),ey:cl(+r[10]|0,0,13),ty:cl(+r[11]|0,0,2)});
@@ -306,7 +306,7 @@ const RES=['official-normal','official-snake','official-splitter','official-roya
 const uiCfg=()=>({ui:1,pub:$('pub').checked,pw:$('pw').checked,pf:+$('pfq').value,pks:PK.filter(k=>$('pk_'+k).checked),mo:+$('mo').value,pm:+$('pm').value,sz:+$('sz').value,mt:+$('mt').value,sd:$('sd').value,bon:$('bon').checked,bct:+$('bct').value,rlen:+$('rlen').value,end:$('end').value,ev:+$('ev').value,tgm:$('tgm').value,tgp:+$('tgp').value,dg:$('dg').checked,wr:$('wr').checked,bu:$('bu').checked,tn:$('tmo').checked?+$('tmn').value:0});
 function hostCfg(c,keep){
   c=c||uiCfg();
-  H.pub=!!c.pub;H.tn=(+c.tn|0)>=2?cl(+c.tn|0,2,6):0;H.pw=!!c.pw;H.pf=cl(+c.pf||5,1,10);H.pks=PK.filter(k=>(c.pks||PK).includes(k));H.pups.length=0;H.mode=cl(+c.mo|0,0,3);H.pm=cl(+c.pm|0,0,3);H.bu=!!c.bu||H.pm===2;if(H.pm!==3)askedRoom='';if(!keep){trl.clear();me.cs=[]}
+  H.pub=!!c.pub;H.tn=(+c.tn|0)>=2?cl(+c.tn|0,2,6):0;H.pw=!!c.pw;H.pf=cl(+c.pf||5,1,10);H.pks=PK.filter(k=>(c.pks||PK).includes(k));H.pups.length=0;H.mode=cl(+c.mo|0,0,3);H.pm=cl(+c.pm|0,0,4);H.bu=!!c.bu||H.pm===2;if(H.pm<3)askedRoom='';if(!keep){trl.clear();me.cs=[]}
   const ty=+c.mt?1:0,sd=ty?seedOf(String(c.sd||'')):0;if(ty&&c.ui)$('sd').value=sd;H.wrap=!!c.wr;H.dg=!!c.dg;setMap(cl(+c.sz|0,0,3),ty,sd,keep);
   H.bots.length=0;if(c.bon)for(let i=0;i<cl(+c.bct|0,0,30);i++)H.bots.push(mkbot(i,i+1));
   const mins=x=>(x>0?cl(x,.1,240):3)*60000;
@@ -315,7 +315,7 @@ function hostCfg(c,keep){
   H.len=H.mode===1?mins(+c.rlen):H.et?mins(+c.ev):180000;
   H.rend=performance.now()+H.len;H.hill=H.mode===2?spot(60):[W/2,W/2];H.ht=0;H.tags=[];H.hold=new Map();H.imm=new Map();H.tgp=String(c.tgm)==='1'?+c.tgp||0:0;
   H.cfg={...c,ui:0,sd:String(sd),bu:H.bu?1:0};setTimeout(dirReg,800)}
-function applyG(g){{net.dg=+g[11]?1:0;net.wrap=+g[12]?1:0;const pm=cl(+g[10]|0,0,3);if(pm!==net.pm){net.pm=pm;trl.clear();me.cs=[];if(pm!==3)askedRoom=''}}const sz=cl(+g[1]|0,0,3),ty=+g[8]?1:0,sd=ty?+g[9]|0:0;if(sz!==CUR.sz||ty!==CUR.ty||sd!==CUR.seed)setMap(sz,ty,sd);net.mode=cl(+g[0]|0,0,3);net.tags=String(g[5]||'').split(',').filter(Boolean).slice(0,60);net.goal=+g[6]||60;net.et=+g[7]?1:0;net.rem=+g[2]||0;net.remAt=performance.now();net.hill=[+g[3]||0,+g[4]||0]}
+function applyG(g){{net.dg=+g[11]?1:0;net.wrap=+g[12]?1:0;const pm=cl(+g[10]|0,0,4);if(pm!==net.pm){net.pm=pm;trl.clear();me.cs=[];if(pm<3)askedRoom=''}}const sz=cl(+g[1]|0,0,3),ty=+g[8]?1:0,sd=ty?+g[9]|0:0;if(sz!==CUR.sz||ty!==CUR.ty||sd!==CUR.seed)setMap(sz,ty,sd);net.mode=cl(+g[0]|0,0,3);net.tags=String(g[5]||'').split(',').filter(Boolean).slice(0,60);net.goal=+g[6]||60;net.et=+g[7]?1:0;net.rem=+g[2]||0;net.remAt=performance.now();net.hill=[+g[3]||0,+g[4]||0]}
 function banner(t){const b=$('bn');b.textContent=t;b.hidden=false;clearTimeout(bt);bt=setTimeout(()=>{b.hidden=true},5000)}
 let win=null;function onWin(name){win=name?{n:name,until:performance.now()+8000}:null;banner(name?name+' wins the round!':'Round over');me.pt=0;if(me.alive){const p=spot(R(20),me);me.x=p[0];me.y=p[1];me.ang=openAng(p[0],p[1]);me.px=void 0;me.m=20;me.cs=[];me.life++}}
 function endRound(name){
@@ -367,7 +367,7 @@ function browse(q){
     for(const x of l)mkI((RES.includes(x.r)?'⭐ Official · ':'')+String(x.r).slice(0,20)+'\n'+(MODES[x.mo]||'?')+' · '+(PTN[x.pm]||'Blob')+' · '+((SIZES[x.sz]||{}).n||'?')+' · '+(x.ty?'Maze #'+x.sd:'Open')+'\n👥 '+(+x.n||0)+' playing · 🤖 '+(+x.b||0)+' bots · ⚡ '+(x.pw?x.pw+'/'+PK.length+' powerups, freq '+x.pf+'/10':'no powerups')+(x.dg?' · ☠ deadly walls':'')+(x.wr?' · ∞ wrap':''),()=>joinRoom(x.r),L,x.cf||OFF[x.r]);
   });
 }
-const PTN=['Blob','Snake','Splitter','Combined'],cfgInfo=c=>{c=c&&typeof c==='object'?c:{};const mo=c.mo|0,pks=Array.isArray(c.pks)?c.pks.filter(k=>PK.includes(k)):[],S=SIZES[cl(c.sz|0,0,3)];return['Mode: '+(MODES[cl(mo,0,3)])+(mo===1?' · '+(+c.rlen||3)+' min rounds':mo>=2?(String(c.end)==='1'?' · most points in '+(+c.ev||3)+' min':' · goal '+(+c.ev||(mo===3?100:60))+' pts'):'')+(mo===3?' · seekers: '+(String(c.tgm)==='1'?(+c.tgp||20)+'% of players':'one'):''),'Player type: '+PTN[cl(c.pm|0,0,3)],'Map: '+S.n+' ('+S.w+'px) · '+(+c.mt?'Maze #'+String(c.sd).slice(0,10):'Open'),'Bots: '+(c.bon?cl(c.bct|0,0,30):'off'),'Powerups: '+(c.pw?(pks.map(k=>PI[k]+' '+PN[k][0]).join(', ')||'none')+' · frequency '+cl(+c.pf|0,1,10)+'/10':'off'),'Deadly edges and walls: '+(c.dg?'yes':'no'),'Wrap-around edges: '+(c.wr?'yes':'no'),'Killer bushes: '+(c.bu?'yes':'no'),'Teams: '+((+c.tn|0)>=2?cl(+c.tn|0,2,6)+' teams (coloured outlines, teammates can’t eat each other)':'off'),'Listed publicly: '+(c.pub?'yes':'no')].join('\n')};
+const PTN=['Blob','Snake','Splitter','Combined','Combined (no snake)'],cfgInfo=c=>{c=c&&typeof c==='object'?c:{};const mo=c.mo|0,pks=Array.isArray(c.pks)?c.pks.filter(k=>PK.includes(k)):[],S=SIZES[cl(c.sz|0,0,3)];return['Mode: '+(MODES[cl(mo,0,3)])+(mo===1?' · '+(+c.rlen||3)+' min rounds':mo>=2?(String(c.end)==='1'?' · most points in '+(+c.ev||3)+' min':' · goal '+(+c.ev||(mo===3?100:60))+' pts'):'')+(mo===3?' · seekers: '+(String(c.tgm)==='1'?(+c.tgp||20)+'% of players':'one'):''),'Player type: '+PTN[cl(c.pm|0,0,4)],'Map: '+S.n+' ('+S.w+'px) · '+(+c.mt?'Maze #'+String(c.sd).slice(0,10):'Open'),'Bots: '+(c.bon?cl(c.bct|0,0,30):'off'),'Powerups: '+(c.pw?(pks.map(k=>PI[k]+' '+PN[k][0]).join(', ')||'none')+' · frequency '+cl(+c.pf|0,1,10)+'/10':'off'),'Deadly edges and walls: '+(c.dg?'yes':'no'),'Wrap-around edges: '+(c.wr?'yes':'no'),'Killer bushes: '+(c.bu?'yes':'no'),'Teams: '+((+c.tn|0)>=2?cl(+c.tn|0,2,6)+' teams (coloured outlines, teammates can’t eat each other)':'off'),'Listed publicly: '+(c.pub?'yes':'no')].join('\n')};
 function mkI(t,fn,L,c){const w=document.createElement('div'),r=document.createElement('div'),d=document.createElement('div');r.style.cssText='display:grid;grid-template-columns:minmax(0,1fr) 48px;gap:6px;margin:0 0 6px';const b=mk(t,fn,r);b.style.cssText='margin:0;width:auto;min-width:0';const i=mk('ⓘ',()=>{d.hidden=!d.hidden},r);i.style.cssText='margin:0;width:auto;padding:0;text-align:center;font-size:20px;background:var(--bg);color:var(--fg);border:1px solid var(--grid)';i.setAttribute('aria-label','Room details');d.hidden=true;d.style.cssText='text-align:left;white-space:pre-line;font-size:13px;color:var(--mut);margin:0 0 8px;padding:8px 10px;background:var(--bg);border-radius:10px';d.textContent=c?cfgInfo(c):'No details available';w.append(r,d);L.appendChild(w);return b}
 function showV(v){for(const id of['v0','vh','vb','vj','vo','vs'])$(id).hidden=id!==v}
 for(const b of document.querySelectorAll('.back'))b.onclick=()=>showV('v0');
@@ -429,8 +429,9 @@ function think(b,pl){b.bo=0;const bt=ety(b);
     if(o===b||(b.tm>=0&&o.tm===b.tm))continue;
     const dx=dw(b.x,o.x),dy=dw(b.y,o.y),d=Math.hypot(dx,dy)||1,rg=R(o.m)+fr,key=typeof o.id==='number'?'b'+o.id:o.id;
     if(d>Math.max(rg,pr)||(maze&&!los(b,o)))continue;       // no seeing through walls
-    if(o.m>b.m*1.12&&d<rg&&(b.iq>.3||Math.random()<.5)){const w=1-d/rg;ax-=dx/d*w;ay-=dy/d*w;tw+=w}
-    else if(b.md===0&&b.hn&&b.m>o.m*1.25&&!o.s&&d<pr&&d<pd&&!(b.ig&&b.ig.k===key&&t<b.ig.u)){prey=o;pd=d;pkey=key}
+    const xs=PM()===3&&(bt===1)!==(ety(o)===1),sc=xs?bt===1:o.m>b.m*1.12,hu=xs?bt!==1:b.m>o.m*1.25;   // snake vs blob: size does not matter (snake flees every blob, blobs hunt snake heads)
+    if(sc&&d<rg&&(b.iq>.3||Math.random()<.5)){const w=1-d/rg;ax-=dx/d*w;ay-=dy/d*w;tw+=w}
+    else if(b.md===0&&b.hn&&hu&&!o.s&&d<pr&&d<pd&&!(b.ig&&b.ig.k===key&&t<b.ig.u)){prey=o;pd=d;pkey=key}
   }
   if(H.bu&&bigB(b.m))for(const q of bushes()){const dx=q[0]-b.x,dy=q[1]-b.y,d=Math.hypot(dx,dy)||1,rg=BR+R(b.m)+150;if(d<rg){const w=1-d/rg;ax-=dx/d*w*2;ay-=dy/d*w*2;tw+=w}}
   let ux=0,uy=0,wk=.6;
@@ -558,7 +559,7 @@ function upd(k,o){let t=trl.get(k);if(!t){t={pts:[{x:o.x,y:o.y}],m:o.m,dm:o.m,s:
   const l=t.pts[t.pts.length-1],d=Math.hypot(o.x-l.x,o.y-l.y);if(d>300){if(WRAP()&&(Math.abs(o.x-l.x)>W/2||Math.abs(o.y-l.y)>W/2)){const sx=Math.abs(o.x-l.x)>W/2?Math.sign(o.x-l.x)*W:0,sy=Math.abs(o.y-l.y)>W/2?Math.sign(o.y-l.y)*W:0;for(const q of t.pts){q.x+=sx;q.y+=sy}t.pts.push({x:o.x,y:o.y})}else t.pts=[{x:o.x,y:o.y}]}else if(d>=5)t.pts.push({x:o.x,y:o.y});
   t.m=o.m;t.dm+=(o.m-t.dm)*(1-Math.exp(-DT*9));t.s=o.s;t.r=R(o.m);t.n=o.n;const mx=Math.ceil((80+Math.max(t.m,t.dm)*6)/5)+10;if(t.pts.length>mx)t.pts.splice(0,t.pts.length-mx)}
 function segs(t,sp){const o=[],p=t.pts,L=80+(t.dm??t.m)*6;sp=Math.max(sp,L/260);const n=Math.min(260,Math.floor(L/sp));let acc=0,nx=sp;for(let i=p.length-1;i>0&&o.length<n;i--){acc+=Math.hypot(p[i].x-p[i-1].x,p[i].y-p[i-1].y);if(acc>=nx){o.push(p[i-1]);nx+=sp}}return o}
-function hitTail(x,y,r,self,m,soft){for(const[k,t]of trl){if(k===self||sameT(k,self)||(soft&&m>t.m*1.12))continue;const hr=t.r*.8;for(const s of segs(t,t.r*1.4))if(Math.hypot(s.x-x,s.y-y)<(r+hr)*.8)return k}return null}
+function hitTail(x,y,r,self,m,soft){for(const[k,t]of trl){if(k===self||sameT(k,self))continue;const hr=t.r*.8;for(const s of segs(t,t.r*1.4))if(Math.hypot(s.x-x,s.y-y)<(r+hr)*.8)return k}return null}
 const RT=m=>12000+m*20;function split(){if(MY()!==2||!me.alive)return;const dx=ptr?ptr[0]-vw/2:1,dy=ptr?ptr[1]-vh/2:0,d=Math.hypot(dx,dy)||1;
   for(const c of[me,...me.cs]){if(me.cs.length>=15||c.m<36)continue;c.m/=2;const tt=performance.now()+RT(c.m);c.t=tt;me.cs.push({x:c.x,y:c.y,m:c.m,ty:2,vx:dx/d*700,vy:dy/d*700,t:tt})}}
 function lose(c,by){if(c===me)die(by);else me.cs.splice(me.cs.indexOf(c),1)}
@@ -584,10 +585,11 @@ function agarStep(dt,now){
       if(swallow(c,q)&&!p.s){const k=p.id+':'+i+':'+p.cs.length+':'+p.l;if(!ate.has(k)){ate.add(k);c.m+=q.m*.8}}
       else if(!shielded()&&swallow(q,c))return lose(c,p.n)}}}}
 // ---- game ----
-// Collision rules, identical for players, peers and bots. Type of an entity: ety(). Bigger eats smaller by a fixed ratio (1.25 if a splitter is involved, else 1.12), ties never eat.
-// Snake vs snake is decided by heads and tails instead (headHit/hitTail); a non-snake touching a snake's tail dies unless it is 1.12x bigger than that snake. Eating always gives 80% of the victim's mass.
-const ety=o=>PM()===3?(o.ty|0):PM(),
-swallow=(a,b)=>{const ta=ety(a),tb=ety(b);return!(ta===1&&tb===1)&&!(a.tm>=0&&a.tm===b.tm)&&a.m>b.m*(ta===2||tb===2?1.25:1.12)&&Math.hypot(a.x-b.x,a.y-b.y)<R(a.m)-R(b.m)*.4};
+// Collision rules, identical for players, peers and bots. Type of an entity: ety(). Blob/splitter: bigger eats smaller by a fixed ratio (1.25 if a splitter is involved, else 1.12), ties never eat.
+// Snake vs snake is decided by heads and tails instead (headHit/hitTail). Snake vs blob/splitter (Combined): a snake only kills with its tail and dies if its head touches a blob or splitter;
+// a blob or splitter dies on a snake's tail and kills the snake by touching its head, whatever the sizes. Eating always gives 80% of the victim's mass.
+const ety=o=>PM()>=3?(PM()===4&&o.ty===1?0:o.ty|0):PM(),
+swallow=(a,b)=>{const ta=ety(a),tb=ety(b);if(ta===1||(a.tm>=0&&a.tm===b.tm))return false;const d=Math.hypot(a.x-b.x,a.y-b.y);if(tb===1)return d<(R(a.m)+R(b.m))*.85;return a.m>b.m*(ta===2||tb===2?1.25:1.12)&&d<R(a.m)-R(b.m)*.4};
 function takePel(i){const q=pel[i];if(isHost){rp(q);H.pch.push(i)}else{send({t:'q',i});q.x=q.y=-9999}}
 function eatPellets(o){const vc=performance.now()<fx.vacuum&&(o===me||me.cs.includes(o))?2.3:1;for(let i=0;i<pel.length;i++){const q=pel[i];if(Math.hypot(q.x-o.x,q.y-o.y)<R(o.m)*(ety(o)===1?1.8:1)*vc){o.m+=(o===me&&performance.now()<fx.feast)?3:1;takePel(i)}}}
 const syncUi=()=>{$('mnb').hidden=$('inf').hidden=!me.alive;if(!me.alive)$('ip').hidden=true};
@@ -607,7 +609,7 @@ $('go').onclick=()=>{
   if(!$('vh').hidden&&RES.includes(r)){note('Official room names are reserved. Pick another name.');return}
   if(r!==net.room||net.state==='off')connect(r);else if(isHost&&net.peers.length===0)hostCfg(OFF[r]||null);
   history.replaceState(null,'','#'+r);
-  save();if(!$('vh').hidden?+$('pm').value===3:!!(OFF[r]&&OFF[r].pm===3))askType();else spawn();$('dc').hidden=true;$('ov').style.display='none';push();
+  save();const ap=!$('vh').hidden?+$('pm').value:(OFF[r]?OFF[r].pm|0:0);if(ap>=3)askType(ap);else spawn();$('dc').hidden=true;$('ov').style.display='none';push();
 };
 $('nm').addEventListener('keydown',e=>{if(e.key==='Enter')$('bh').click()});
 
@@ -653,7 +655,7 @@ function inBush(x,y,m){if(!bigB(m))return false;const lim=BR+R(m)*.7;for(const q
 function bushHit(){for(const c of[me,...me.cs])if(inBush(c.x,c.y,c.m)){lose(c,'A bush');return}}
 function tick(now){
   const dt=Math.min((now-last)/1000,.05);last=now;DT=dt;
-  const peers=net.peers;stampT();if(PM()===3&&me.alive&&askedRoom!==net.room&&$('ov').style.display==='none')askType();
+  const peers=net.peers;stampT();if(PM()>=3&&me.alive&&askedRoom!==net.room&&$('ov').style.display==='none')askType(PM());
 
   if(me.alive){
     if(MY()===1)snakeMove(dt,now);else if(ptr){const dx=ptr[0]-vw/2,dy=ptr[1]-vh/2,d=Math.hypot(dx,dy);
@@ -679,6 +681,11 @@ function tick(now){
   if(me.alive)for(const p of peers){
     if(NE()&&swallow(me,p)&&!p.s)nr.set(p.id,{t:now,l:p.l,m:p.m});
     else if(NE()&&!shielded()&&swallow(p,me)){die(p.n);break}
+    else if(NE()&&p.cs&&p.cs.length){let dd=0;   // blobs and snakes also meet the split cells of a splitter
+      for(let i=0;i<p.cs.length;i++){const q=p.cs[i];
+        if(!p.s&&swallow(me,q)){const k=p.id+':'+(i+1)+':'+p.cs.length+':'+p.l;if(!ate.has(k)){ate.add(k);me.m+=q.m*.8}}
+        else if(!shielded()&&swallow(q,me)){die(p.n);dd=1;break}}
+      if(dd)break}
   }
 
   for(const[id,e]of nr){const p=peers.find(q=>q.id===id);if(now-e.t>900)nr.delete(id);else if(!p||p.l>e.l){me.m+=e.m*.8;nr.delete(id)}}if(me.alive&&now-lastPush>50){push();lastPush=now}
@@ -855,11 +862,11 @@ const seedOf=t=>{t=t.trim();if(!t)return 1+(Math.random()*999999999|0);if(/^\d{1
 for(const k of PK){const l=document.createElement('label'),i=document.createElement('input');l.className='ck';i.type='checkbox';i.id='pk_'+k;i.checked=true;l.append(i,PI[k]+' '+PN[k][0]);$('pks').appendChild(l)}
 function hostUi(){modeUi();{const sp=$('pm').value==='2';if(sp)$('bu').checked=true;$('bu').disabled=sp}$('oTm').hidden=!$('tmo').checked;$('tmv').textContent=$('tmn').value;$('oP').hidden=!$('pw').checked;$('oB').hidden=!$('bon').checked;$('oS').hidden=$('mt').value!=='1';$('bcv').textContent=$('bct').value;$('pfv').textContent=$('pfq').value}
 for(const id of['pw','bon','mt','bct','pfq','tgm','tgp','tmo','tmn','pm'])$(id).addEventListener('input',hostUi);
-const PRE={normal:{pm:0,mo:0,sz:1,mt:0,bon:1,bct:6,pw:0,pf:5,pks:PK},snake:{dg:1,pm:1,mo:0,sz:3,mt:0,bon:1,bct:25,pw:1,pf:3,pks:['bolt','magnet','feast','grow','nitro']},splitter:{pm:2,mo:0,sz:2,mt:0,bon:1,bct:15,pw:0,pf:5,pks:PK,bu:1},royale:{pm:3,mo:0,sz:2,mt:0,bon:1,bct:20,pw:1,pf:3,pks:['bolt','shield','magnet','feast','mass'],bu:1},maze:{pm:0,mo:1,sz:1,mt:1,bon:1,bct:8,pw:1,pf:6,pks:PK}};
-$('ps').onchange=e=>{const v=e.target.value;let p=PRE[v];if(v==='rnd'){const r=Math.random;p={wr:r()<.15?1:0,dg:r()<.2?1:0,pm:r()*4|0,mo:r()*4|0,sz:r()*4|0,mt:r()<.4?1:0,bon:r()<.8?1:0,bct:1+(r()*30|0),pw:r()<.6?1:0,pf:1+(r()*10|0),bu:r()<.25?1:0,tn:r()<.25?2+(r()*3|0):0,pks:PK.filter(()=>r()<.6)};if(!p.pks.length)p.pks=[pk(PK)]}
+const PRE={normal:{pm:0,mo:0,sz:1,mt:0,bon:1,bct:6,pw:0,pf:5,pks:PK},snake:{dg:1,pm:1,mo:0,sz:3,mt:0,bon:1,bct:25,pw:1,pf:3,pks:['bolt','magnet','feast','grow','nitro']},splitter:{pm:2,mo:0,sz:2,mt:0,bon:1,bct:15,pw:0,pf:5,pks:PK,bu:1},royale:{pm:3,mo:0,sz:2,mt:0,bon:1,bct:20,pw:1,pf:3,pks:['bolt','shield','magnet','feast','mass'],bu:1},duo:{pm:4,mo:0,sz:2,mt:0,bon:1,bct:20,pw:1,pf:3,pks:['bolt','shield','magnet','feast','mass'],bu:1},maze:{pm:0,mo:1,sz:1,mt:1,bon:1,bct:8,pw:1,pf:6,pks:PK}};
+$('ps').onchange=e=>{const v=e.target.value;let p=PRE[v];if(v==='rnd'){const r=Math.random;p={wr:r()<.15?1:0,dg:r()<.2?1:0,pm:r()*5|0,mo:r()*4|0,sz:r()*4|0,mt:r()<.4?1:0,bon:r()<.8?1:0,bct:1+(r()*30|0),pw:r()<.6?1:0,pf:1+(r()*10|0),bu:r()<.25?1:0,tn:r()<.25?2+(r()*3|0):0,pks:PK.filter(()=>r()<.6)};if(!p.pks.length)p.pks=[pk(PK)]}
   if(p){$('pm').value=p.pm;$('dg').checked=!!p.dg;$('bu').checked=!!p.bu;$('tmo').checked=!!p.tn;$('tmn').value=p.tn||2;$('wr').checked=!!p.wr;$('mo').value=p.mo;$('sz').value=p.sz;$('mt').value=p.mt;$('sd').value='';$('bon').checked=!!p.bon;$('bct').value=p.bct;$('pw').checked=!!p.pw;$('pfq').value=p.pf;for(const k of PK)$('pk_'+k).checked=p.pks.includes(k);evDef();hostUi()}e.target.value=''};
 hostUi();
-function askType(){askedRoom=net.room;me.alive=false;me.cs=[];boost=false;cb=false;ptr=null;syncUi();$('dc').hidden=true;$('cf').hidden=true;$('tc').hidden=false;push()}
+function askType(p){const ns=p===4;$('tcp').textContent=ns?'Combined mode without snakes: Blob and Splitter fight in the same room. The bigger one eats the smaller one.':'Combined mode: Blob, Snake and Splitter fight in one room. A snake kills only with its tail and dies if its head touches a blob or splitter. Blobs and splitters die on a snake’s tail and kill it by touching its head; against each other the bigger one eats the smaller one.';$('tcs').hidden=ns;if(ns&&me.ty===1)me.ty=0;askedRoom=net.room;me.alive=false;me.cs=[];boost=false;cb=false;ptr=null;syncUi();$('dc').hidden=true;$('cf').hidden=true;$('tc').hidden=false;push()}
 for(const b of document.querySelectorAll('#tc button[data-t]'))b.onclick=()=>{me.ty=+b.dataset.t;save();$('tc').hidden=true;spawn();push()};
 $('tcb').onclick=()=>{$('tc').hidden=true;showV('v0');$('ov').style.display='flex';leaveRoom();clearSaved()};
 
